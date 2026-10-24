@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Internações — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">Acompanhe os pacientes internados</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
+        <!-- montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+      </ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+          <div class="int-split">
+
+            <!-- LATERAL: busca + pacientes -->
+            <aside class="int-side">
+              <div class="side-card side-search">
+                <span class="side-title">Buscar paciente</span>
+                <div class="search-wrap">
+                  <span class="material-symbols-outlined">search</span>
+                  <input type="text" id="searchInput" placeholder="Nome, CPF ou telefone..." oninput="filterInt(this.value)">
+                </div>
+              </div>
+              <div class="side-card">
+                <div class="side-card-head">
+                  <span class="side-title">Pacientes</span>
+                  <span class="count-badge" id="countBadge">0</span>
+                </div>
+                <div class="side-list" id="intList"></div>
+                <div class="list-empty" id="emptyState" style="display:none">
+                  <span class="material-symbols-outlined">bed</span>
+                  <p>Nenhum paciente internado.</p>
+                </div>
+              </div>
+            </aside>
+
+            <!-- PRINCIPAL -->
+            <section>
+              <div class="side-card obs-empty" id="intEmpty">
+                <span class="material-symbols-outlined">touch_app</span>
+                <p>Selecione um paciente na lista.</p>
+              </div>
+
+              <div class="int-main" id="intContent" style="display:none">
+
+                <!-- Resumo do paciente -->
+                <div class="side-card int-header">
+                  <div class="ps-banner"></div>
+                  <div class="ps-body" id="patientSummary"></div>
+                </div>
+
+                <div class="int-tabs-card">
+                  <div class="modal-tabs" id="intTabs">
+                    <button type="button" class="modal-tab-btn active" data-tab="admissao">
+                      <span class="material-symbols-outlined">assignment_ind</span> Admissão
+                    </button>
+                    <button type="button" class="modal-tab-btn" data-tab="enfermagem">
+                      <span class="material-symbols-outlined">vaccines</span> Evolução Enfermagem <span class="material-symbols-outlined tab-lock">lock</span>
+                    </button>
+                    <button type="button" class="modal-tab-btn" data-tab="medica">
+                      <span class="material-symbols-outlined">stethoscope</span> Evolução Médica <span class="material-symbols-outlined tab-lock">lock</span>
+                    </button>
+                  </div>
+
+                  <!-- ===================== ADMISSÃO ===================== -->
+                  <div class="modal-tab-pane active" id="tab-admissao">
+                    <div class="tab-content" id="admForm">
+
+                      <details class="acc" open>
+                        <summary><span class="material-symbols-outlined">bed</span> Leito e internação <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="admData">Data da admissão <span class="req">*</span></label>
+                              <input type="date" class="field-input" id="admData" onchange="clearErr('admData')">
+                              <div class="field-error" id="err-admData">Data obrigatória</div>
+                            </div>
+                            <div class="field-group">
+                              <label class="field-label" for="admHora">Hora da admissão <span class="req">*</span></label>
+                              <input type="time" class="field-input" id="admHora" onchange="clearErr('admHora')">
+                              <div class="field-error" id="err-admHora">Hora obrigatória</div>
+                            </div>
+                          </div>
+                          <p class="field-hint" id="wardPerfil" style="margin:0 0 8px"></p>
+                          <div class="ward-tabs" id="wardTabs"></div>
+                          <div class="bed-grid" id="bedGrid"></div>
+                          <div class="field-hint" id="leitoHint" style="margin-bottom:12px"></div>
+                          <div class="field-error" id="err-leito" style="margin:-6px 0 12px">Escolha um leito livre para a admissão</div>
+                          <div class="field-group">
+                            <label class="field-label" for="admCarater">Caráter de internação</label>
+                            <select class="field-select" id="admCarater">
+                              <option value="01">01 - Eletiva</option>
+                              <option value="02">02 - Urgência</option>
+                              <option value="03">03 - Acidente no local de trabalho</option>
+                              <option value="04">04 - Acidente no trajeto para o trabalho</option>
+                              <option value="05">05 - Outros tipos de acidentes de trânsito</option>
+                              <option value="06">06 - Outros tipos de lesões</option>
+                            </select>
+                          </div>
+                        </div>
+                      </details>
+
+                      <details class="acc">
+                        <summary><span class="material-symbols-outlined">group</span> Acompanhante <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="ac_nome">Nome do acompanhante</label>
+                              <input type="text" class="field-input" id="ac_nome" name="ac_nome">
+                            </div>
+                            <div class="field-group">
+                              <label class="field-label" for="ac_telefone">Telefone</label>
+                              <input type="text" inputmode="tel" class="field-input" id="ac_telefone" name="ac_telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)">
+                            </div>
+                          </div>
+                          <div class="field-row-3">
+                            <div class="field-group">
+                              <label class="field-label" for="ac_parentesco">Parentesco</label>
+                              <select class="field-select" id="ac_parentesco" name="ac_parentesco">
+                                <option value="">Selecione...</option>
+                                <option value="pais">Pai / Mãe</option>
+                                <option value="filho">Filho(a)</option>
+                                <option value="conjuge">Cônjuge</option>
+                                <option value="familia">Família estendida</option>
+                                <option value="amigo">Amigo(a)</option>
+                                <option value="outro">Outro</option>
+                              </select>
+                            </div>
+                            <div class="field-group">
+                              <label class="field-label" for="ac_doc_tipo">Documento</label>
+                              <select class="field-select" id="ac_doc_tipo" name="ac_doc_tipo">
+                                <option value="">Selecione...</option>
+                                <option value="rg">RG</option>
+                                <option value="cpf">CPF</option>
+                                <option value="outro">Outro</option>
+                              </select>
+                            </div>
+                            <div class="field-group">
+                              <label class="field-label" for="ac_doc_numero">Número</label>
+                              <input type="text" class="field-input" id="ac_doc_numero" name="ac_doc_numero">
+                            </div>
+                          </div>
+                        </div>
+                      </details>
+
+                      <details class="acc">
+                        <summary><span class="material-symbols-outlined">medication</span> Medicamentos e exames da consulta <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <div class="acc-sub">Check-in administração</div>
+                          <div id="admCheckMed"></div>
+                          <div class="acc-sub">Check-in coleta</div>
+                          <div id="admCheckExame"></div>
+                          <p class="field-hint" style="margin:0 0 12px">O check-in é gravado na hora, sem depender do Salvar.</p>
+                        </div>
+                      </details>
+
+                      <!-- cards: cada um abre seu formulário em modal (os campos continuam dentro do formulário da admissão) -->
+                      <div class="adm-cards">
+                        <button type="button" class="adm-card" onclick="abrirModalAdm('habitos')">
+                          <span class="material-symbols-outlined adm-card-ic">self_improvement</span>
+                          <strong>Anamnese — Hábitos</strong>
+                          <span class="adm-card-status" id="admCard-habitos"></span>
+                        </button>
+                        <button type="button" class="adm-card" onclick="abrirModalAdm('historicos')">
+                          <span class="material-symbols-outlined adm-card-ic">history_edu</span>
+                          <strong>Anamnese — Históricos</strong>
+                          <span class="adm-card-status" id="admCard-historicos"></span>
+                        </button>
+                        <button type="button" class="adm-card" onclick="abrirModalAdm('estado')">
+                          <span class="material-symbols-outlined adm-card-ic">accessibility_new</span>
+                          <strong>Estado de entrada</strong>
+                          <span class="adm-card-status" id="admCard-estado"></span>
+                        </button>
+                        <button type="button" class="adm-card" onclick="abrirModalAdm('sinais')">
+                          <span class="material-symbols-outlined adm-card-ic">ecg_heart</span>
+                          <strong>Sinais vitais</strong>
+                          <span class="adm-card-status" id="admCard-sinais"></span>
+                        </button>
+                      </div>
+
+                      <div class="modal-overlay adm-modal" id="modal-habitos" onclick="if (event.target === this) fecharModalAdm('habitos')">
+                      <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="modal-habitos-titulo">
+                        <div class="modal-head">
+                          <h5 id="modal-habitos-titulo">Anamnese — Hábitos</h5>
+                          <button type="button" class="modal-close" onclick="fecharModalAdm('habitos')" aria-label="Fechar"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div class="adm-modal-body">
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="hab_religiao">Religião</label>
+                              <select class="field-select" id="hab_religiao" name="hab_religiao">
+                                <option value="">Selecione...</option>
+                                <option value="catolica">Católica</option>
+                                <option value="evangelica">Evangélica</option>
+                                <option value="protestante">Protestante</option>
+                                <option value="espirita">Espírita</option>
+                                <option value="matriz_africana">Matriz africana</option>
+                                <option value="sem">Sem religião</option>
+                                <option value="outra">Outra</option>
+                              </select>
+                            </div>
+                            <div class="field-group" style="display:flex;align-items:flex-end">
+                              <label class="check-chip" style="width:100%"><input type="checkbox" name="hab_religiao_praticante"> Praticante</label>
+                            </div>
+                          </div>
+
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hab_tabagista"> Tabagista</label>
+                            <input type="text" class="field-input" name="hab_tabagista_qtd" placeholder="Quantidade por dia">
+                            <span></span>
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hab_drogas"> Uso de drogas</label>
+                            <input type="text" class="field-input" name="hab_drogas_tipo" placeholder="Quais">
+                            <input type="text" class="field-input" name="hab_drogas_freq" placeholder="Frequência">
+                          </div>
+
+                          <div class="field-group">
+                            <label class="field-label">Etilismo</label>
+                            <div class="check-line" style="margin-bottom:0">
+                              <div class="seg" style="grid-column: span 2">
+                                <label><input type="radio" name="hab_etilista" value="nao"><span>Não</span></label>
+                                <label><input type="radio" name="hab_etilista" value="sim"><span>Sim</span></label>
+                                <label><input type="radio" name="hab_etilista" value="as_vezes"><span>Às vezes</span></label>
+                              </div>
+                              <input type="text" class="field-input" name="hab_etilista_freq" placeholder="Frequência">
+                            </div>
+                          </div>
+
+                          <div class="acc-sub">Alimentação</div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hab_apetite"> Apetite preservado</label>
+                            <input type="number" class="field-input" name="hab_refeicoes" min="0" placeholder="Refeições por dia">
+                            <span></span>
+                          </div>
+                          <div class="check-grid">
+                            <label class="check-chip"><input type="checkbox" name="hab_mastigacao"> Problema de mastigação</label>
+                            <label class="check-chip"><input type="checkbox" name="hab_degluticao"> Problema de deglutição</label>
+                            <label class="check-chip"><input type="checkbox" name="hab_digestao"> Problema de digestão</label>
+                            <label class="check-chip"><input type="checkbox" name="hab_nauseas"> Náuseas</label>
+                            <label class="check-chip"><input type="checkbox" name="hab_pirose"> Pirose</label>
+                          </div>
+
+                          <div class="field-group">
+                            <label class="field-label">Ingestão hídrica</label>
+                            <div class="check-line" style="margin-bottom:0">
+                              <div class="seg" style="grid-column: span 2">
+                                <label><input type="radio" name="hab_hidrica" value="pouco"><span>Pouca</span></label>
+                                <label><input type="radio" name="hab_hidrica" value="normal"><span>Normal</span></label>
+                                <label><input type="radio" name="hab_hidrica" value="muito"><span>Muita</span></label>
+                              </div>
+                              <input type="text" class="field-input" name="hab_hidrica_freq" placeholder="Frequência">
+                            </div>
+                          </div>
+
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hab_atividade"> Atividade física</label>
+                            <input type="text" class="field-input" name="hab_atividade_qual" placeholder="Qual">
+                            <input type="text" class="field-input" name="hab_atividade_freq" placeholder="Frequência">
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hab_sono_dificuldade"> Dificuldade para dormir</label>
+                            <input type="number" class="field-input" name="hab_sono_horas" min="0" max="24" placeholder="Horas de sono">
+                            <span></span>
+                          </div>
+                        </div>
+                        <div class="modal-actions" style="justify-content:flex-end;margin-top:6px">
+                          <button type="button" class="btn-save" onclick="fecharModalAdm('habitos')"><span class="material-symbols-outlined">check</span> Concluir</button>
+                        </div>
+                      </div>
+                      </div>
+
+                      <div class="modal-overlay adm-modal" id="modal-historicos" onclick="if (event.target === this) fecharModalAdm('historicos')">
+                      <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="modal-historicos-titulo">
+                        <div class="modal-head">
+                          <h5 id="modal-historicos-titulo">Anamnese — Históricos</h5>
+                          <button type="button" class="modal-close" onclick="fecharModalAdm('historicos')" aria-label="Fechar"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div class="adm-modal-body">
+                          <div class="acc-sub">Histórico pessoal</div>
+                          <div class="check-grid">
+                            <label class="check-chip"><input type="checkbox" name="hp_dm"> DM</label>
+                            <label class="check-chip"><input type="checkbox" name="hp_has"> HAS</label>
+                            <label class="check-chip"><input type="checkbox" name="hp_irc"> IRC</label>
+                            <label class="check-chip"><input type="checkbox" name="hp_neoplasias"> Neoplasias</label>
+                            <label class="check-chip"><input type="checkbox" name="hp_obesidade"> Obesidade</label>
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hp_respiratorias"> Doenças respiratórias</label>
+                            <input type="text" class="field-input" name="hp_respiratorias_quais" placeholder="Quais">
+                            <span></span>
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hp_cardiopatias"> Cardiopatias</label>
+                            <input type="text" class="field-input" name="hp_cardiopatias_quais" placeholder="Quais">
+                            <span></span>
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hp_internacoes"> Internações anteriores</label>
+                            <input type="text" class="field-input" name="hp_internacoes_motivo" placeholder="Motivo">
+                            <input type="text" class="field-input" name="hp_internacoes_quando" placeholder="Quando">
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hp_cirurgias"> Cirurgias anteriores</label>
+                            <input type="text" class="field-input" name="hp_cirurgias_motivo" placeholder="Motivo">
+                            <input type="text" class="field-input" name="hp_cirurgias_quando" placeholder="Quando">
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hp_medicamentos"> Medicamentos de uso contínuo</label>
+                            <input type="text" class="field-input" name="hp_medicamentos_quais" placeholder="Quais">
+                            <input type="text" class="field-input" name="hp_medicamentos_tempo" placeholder="Há quanto tempo">
+                          </div>
+
+                          <div class="acc-sub" style="margin-top:14px">Histórico familiar</div>
+                          <div class="check-grid">
+                            <label class="check-chip"><input type="checkbox" name="hf_dm"> DM</label>
+                            <label class="check-chip"><input type="checkbox" name="hf_has"> HAS</label>
+                            <label class="check-chip"><input type="checkbox" name="hf_irc"> IRC</label>
+                            <label class="check-chip"><input type="checkbox" name="hf_neoplasias"> Neoplasias</label>
+                            <label class="check-chip"><input type="checkbox" name="hf_obesidade"> Obesidade</label>
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hf_respiratorias"> Doenças respiratórias</label>
+                            <input type="text" class="field-input" name="hf_respiratorias_quais" placeholder="Quais">
+                            <span></span>
+                          </div>
+                          <div class="check-line">
+                            <label class="check-chip"><input type="checkbox" name="hf_cardiopatias"> Cardiopatias</label>
+                            <input type="text" class="field-input" name="hf_cardiopatias_quais" placeholder="Quais">
+                            <span></span>
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="hf_outros">Outros</label>
+                            <input type="text" class="field-input" id="hf_outros" name="hf_outros">
+                          </div>
+                        </div>
+                        <div class="modal-actions" style="justify-content:flex-end;margin-top:6px">
+                          <button type="button" class="btn-save" onclick="fecharModalAdm('historicos')"><span class="material-symbols-outlined">check</span> Concluir</button>
+                        </div>
+                      </div>
+                      </div>
+
+                      <div class="modal-overlay adm-modal" id="modal-estado" onclick="if (event.target === this) fecharModalAdm('estado')">
+                      <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="modal-estado-titulo">
+                        <div class="modal-head">
+                          <h5 id="modal-estado-titulo">Estado de entrada</h5>
+                          <button type="button" class="modal-close" onclick="fecharModalAdm('estado')" aria-label="Fechar"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div class="adm-modal-body">
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="est_entrada">Modo de entrada</label>
+                              <select class="field-select" id="est_entrada" name="est_entrada">
+                                <option value="">Selecione...</option>
+                                <option value="deambulando">Deambulando</option>
+                                <option value="maca">Maca</option>
+                                <option value="cadeira">Cadeira de rodas</option>
+                                <option value="outros">Outros</option>
+                              </select>
+                            </div>
+                            <div class="field-group">
+                              <label class="field-label" for="est_consciencia">Nível de consciência</label>
+                              <select class="field-select" id="est_consciencia" name="est_consciencia">
+                                <option value="">Selecione...</option>
+                                <option value="consciente">Consciente</option>
+                                <option value="inconsciente">Inconsciente</option>
+                                <option value="orientado">Orientado</option>
+                                <option value="desorientado">Desorientado</option>
+                                <option value="torporoso">Torporoso</option>
+                                <option value="apatico">Apático</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="est_pupilas">Pupilas</label>
+                              <select class="field-select" id="est_pupilas" name="est_pupilas">
+                                <option value="">Selecione...</option>
+                                <option value="isocoricas">Isocóricas</option>
+                                <option value="anisocoricas">Anisocóricas</option>
+                                <option value="midriase">Midríase</option>
+                                <option value="miose">Miose</option>
+                              </select>
+                            </div>
+                            <div class="field-group" style="display:flex;align-items:flex-end">
+                              <label class="check-chip" style="width:100%"><input type="checkbox" name="est_fotorreagentes"> Fotorreagentes</label>
+                            </div>
+                          </div>
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="est_autocuidado">Autocuidado</label>
+                              <select class="field-select" id="est_autocuidado" name="est_autocuidado">
+                                <option value="">Selecione...</option>
+                                <option value="dependente">Dependente</option>
+                                <option value="parcial">Parcialmente dependente</option>
+                                <option value="independente">Independente</option>
+                              </select>
+                            </div>
+                            <div class="field-group">
+                              <label class="field-label" for="est_banhos">Banhos diários</label>
+                              <select class="field-select" id="est_banhos" name="est_banhos">
+                                <option value="">Selecione...</option>
+                                <option value="nenhum">Nenhum</option>
+                                <option value="um_dois">Um ou dois</option>
+                                <option value="tres_mais">Três ou mais</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="field-row">
+                            <div class="field-group">
+                              <label class="field-label" for="est_higiene_oral">Higiene oral</label>
+                              <select class="field-select" id="est_higiene_oral" name="est_higiene_oral">
+                                <option value="">Selecione...</option>
+                                <option value="adequado">Adequada</option>
+                                <option value="sem_dentes">Ausência total de dentes</option>
+                                <option value="parcial_dentes">Ausência parcial de dentes</option>
+                                <option value="protese">Uso de prótese</option>
+                                <option value="ortodontico">Aparelho ortodôntico</option>
+                              </select>
+                            </div>
+                            <div class="field-group" style="display:flex;align-items:flex-end">
+                              <label class="check-chip" style="width:100%"><input type="checkbox" name="est_higiene_corporal"> Higiene corporal adequada</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-actions" style="justify-content:flex-end;margin-top:6px">
+                          <button type="button" class="btn-save" onclick="fecharModalAdm('estado')"><span class="material-symbols-outlined">check</span> Concluir</button>
+                        </div>
+                      </div>
+                      </div>
+
+                      <div class="modal-overlay adm-modal" id="modal-sinais" onclick="if (event.target === this) fecharModalAdm('sinais')">
+                      <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="modal-sinais-titulo">
+                        <div class="modal-head">
+                          <h5 id="modal-sinais-titulo">Sinais vitais e dados antropométricos</h5>
+                          <button type="button" class="modal-close" onclick="fecharModalAdm('sinais')" aria-label="Fechar"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div class="adm-modal-body">
+                          <div class="field-row-3">
+                            <div class="field-group"><label class="field-label" for="ssvv_pa">PA (mmHg)</label><input type="text" class="field-input" id="ssvv_pa" name="ssvv_pa" placeholder="120/80"></div>
+                            <div class="field-group"><label class="field-label" for="ssvv_temp">Temp. (°C)</label><input type="number" step="0.1" class="field-input" id="ssvv_temp" name="ssvv_temp"></div>
+                            <div class="field-group"><label class="field-label" for="ssvv_fc">FC (bpm)</label><input type="number" class="field-input" id="ssvv_fc" name="ssvv_fc"></div>
+                          </div>
+                          <div class="field-row-3">
+                            <div class="field-group"><label class="field-label" for="ssvv_spo2">SpO₂ (%)</label><input type="number" class="field-input" id="ssvv_spo2" name="ssvv_spo2"></div>
+                            <div class="field-group"><label class="field-label" for="ssvv_fr">FR (irpm)</label><input type="number" class="field-input" id="ssvv_fr" name="ssvv_fr"></div>
+                            <div class="field-group"><label class="field-label" for="ssvv_glicemia">HGT (mg/dL)</label><input type="number" class="field-input" id="ssvv_glicemia" name="ssvv_glicemia"></div>
+                          </div>
+                          <div class="field-row-3">
+                            <div class="field-group"><label class="field-label" for="antro_peso">Peso (kg)</label><input type="number" step="0.1" class="field-input" id="antro_peso" name="antro_peso" oninput="updateImc()"></div>
+                            <div class="field-group"><label class="field-label" for="antro_altura">Altura (m)</label><input type="number" step="0.01" class="field-input" id="antro_altura" name="antro_altura" placeholder="1,70" oninput="updateImc()"></div>
+                            <div class="field-group"><label class="field-label">IMC</label><div class="field-input" id="imcDisplay" style="background:#f0f2f8">—</div></div>
+                          </div>
+                        </div>
+                        <div class="modal-actions" style="justify-content:flex-end;margin-top:6px">
+                          <button type="button" class="btn-save" onclick="fecharModalAdm('sinais')"><span class="material-symbols-outlined">check</span> Concluir</button>
+                        </div>
+                      </div>
+                      </div>
+
+                      <details class="acc">
+                        <summary><span class="material-symbols-outlined">body_system</span> Exame físico <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <p class="field-hint" style="margin:0 0 12px">Clique nas partes do corpo para informar as condições.</p>
+                          <div class="body-map">
+                            <!-- mesmas formas do mapa do corpo do sistema antigo -->
+                            <svg class="body-svg" viewBox="0 0 826 1600" role="group" aria-label="Mapa do corpo">
+                              <g>
+                                <rect class="body-part" data-regiao="bracos" x="315" y="330" width="105" height="500" rx="50" ry="50" transform="rotate(20, 410, 165)" tabindex="0" role="button" aria-label="Membros superiores"/>
+                                <rect class="body-part" data-regiao="bracos" x="430" y="340" width="105" height="500" rx="50" ry="50" transform="rotate(-20, 410, 165)" tabindex="-1" aria-hidden="true"/>
+                              </g>
+                              <g>
+                                <rect class="body-part" data-regiao="pernas" x="435" y="850" width="125" height="650" rx="60" ry="60" tabindex="0" role="button" aria-label="Membros inferiores"/>
+                                <rect class="body-part" data-regiao="pernas" x="290" y="850" width="125" height="650" rx="60" ry="60" tabindex="-1" aria-hidden="true"/>
+                              </g>
+                              <rect class="body-part" data-regiao="cabeca" x="320" y="80" width="205" height="205" rx="100" ry="100" tabindex="0" role="button" aria-label="Cabeça"/>
+                              <rect class="body-part" data-regiao="corpo" x="290" y="300" width="270" height="595" rx="24" ry="24" tabindex="0" role="button" aria-label="Tórax e sistemas"/>
+                            </svg>
+                            <div class="body-legend" id="bodyLegend"></div>
+                          </div>
+                        </div>
+                      </details>
+
+                      <details class="acc">
+                        <summary><span class="material-symbols-outlined">clinical_notes</span> Diagnósticos e plano de enfermagem <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <div class="field-group">
+                            <label class="field-label">Diagnóstico principal</label>
+                            <div class="field-input" id="diagPrincipal" style="background:#f0f2f8">—</div>
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="diag_outro">Outro diagnóstico</label>
+                            <input type="text" class="field-input" id="diag_outro" name="diag_outro">
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="plano_enfermagem">Plano de enfermagem</label>
+                            <textarea class="field-textarea" id="plano_enfermagem" name="plano_enfermagem"></textarea>
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="implementacao">Implementação</label>
+                            <textarea class="field-textarea" id="implementacao" name="implementacao"></textarea>
+                          </div>
+                        </div>
+                      </details>
+
+                      <details class="acc" open>
+                        <summary><span class="material-symbols-outlined">edit_note</span> Anotação de enfermagem <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <div class="field-group">
+                            <textarea class="field-textarea" id="anotacao" name="anotacao" placeholder="Informe o estado do paciente..."></textarea>
+                          </div>
+                        </div>
+                      </details>
+
+                      <div class="form-footer" style="margin:0 -22px">
+                        <button type="button" class="btn-cancel" onclick="selectAtend(selectedId)">Descartar</button>
+                        <button type="button" class="btn-save" onclick="saveAdmissao()">
+                          <span class="material-symbols-outlined">check_circle</span> Salvar admissão
+                        </button>
+                      </div>
+
+                      <!-- Modal do exame físico (fica dentro do formulário para ser lido junto) -->
+                      <div class="modal-overlay" id="efModal" onclick="if (event.target === this) closeRegiao()">
+                        <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="efTitle">
+                          <div class="modal-head">
+                            <h5 id="efTitle">Exame físico</h5>
+                            <button type="button" class="modal-close" onclick="closeRegiao()" aria-label="Fechar"><span class="material-symbols-outlined">close</span></button>
+                          </div>
+                          <div id="efRegioes"></div>
+                          <div class="modal-actions" style="justify-content:flex-end;margin-top:6px">
+                            <button type="button" class="btn-save" onclick="closeRegiao()"><span class="material-symbols-outlined">check</span> Concluir</button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <!-- ===================== EVOLUÇÃO ENFERMAGEM ===================== -->
+                  <div class="modal-tab-pane" id="tab-enfermagem">
+                    <div class="tab-content">
+                      <div class="tab-toolbar">
+                        <div>
+                          <div class="new-entry-title" style="margin:0">Evoluções de enfermagem</div>
+                          <p class="field-hint" style="margin:2px 0 0" id="enfProxima"></p>
+                        </div>
+                        <button type="button" class="btn-new" id="btnNovaEnf" onclick="abrirNovaEvolucao()">
+                          <span class="material-symbols-outlined">add</span> Novo
+                        </button>
+                      </div>
+
+                      <!-- Formulário de nova evolução: só aparece ao clicar em Novo -->
+                      <div class="nova-evol" id="enfNovaForm" style="display:none">
+                        <div class="new-entry-title" id="enfFormTitulo"><span class="material-symbols-outlined">add_circle</span> Nova evolução de enfermagem</div>
+                        <div class="field-row-3">
+                          <div class="field-group"><label class="field-label" for="enf_data">Data</label><input type="date" class="field-input" id="enf_data" onchange="renderSlotOptions()"></div>
+                          <div class="field-group"><label class="field-label" for="enf_hora">Hora</label><input type="time" class="field-input" id="enf_hora"></div>
+                          <div class="field-group"><label class="field-label" for="enf_profissional">Profissional <span class="req">*</span></label><select class="field-select" id="enf_profissional" onchange="clearErr('enf_profissional')"></select></div>
+                        </div>
+                        <div class="field-error" id="err-enf_profissional" style="margin:-8px 0 10px">Escolha o profissional</div>
+                        <div class="field-group">
+                          <label class="field-label">Acompanhamento</label>
+                          <div class="seg">
+                            <label><input type="radio" name="enf_acomp" value="total"><span>Total</span></label>
+                            <label><input type="radio" name="enf_acomp" value="parcial"><span>Parcial</span></label>
+                            <label><input type="radio" name="enf_acomp" value="nao"><span>Não realizado</span></label>
+                          </div>
+                        </div>
+
+                        <details class="acc" open>
+                          <summary><span class="material-symbols-outlined">medication</span> Medicações e coletas <span class="material-symbols-outlined chev">expand_more</span></summary>
+                          <div class="acc-body">
+                            <div class="field-group" style="max-width:280px">
+                              <label class="field-label" for="enfSlot">Horário da medicação</label>
+                              <select class="field-select" id="enfSlot" onchange="renderDosesSlot()"></select>
+                            </div>
+                            <div id="enfDoses"></div>
+                            <details class="acc" id="enfExtrasWrap" style="margin-top:4px">
+                              <summary><span class="material-symbols-outlined">more_time</span> Se necessário e dose única <span class="material-symbols-outlined chev">expand_more</span></summary>
+                              <div class="acc-body"><div id="enfDosesExtra"></div></div>
+                            </details>
+                            <div class="acc-sub">Coletas pendentes</div>
+                            <div class="check-grid" id="enfCheckExame"></div>
+                          </div>
+                        </details>
+
+                        <details class="acc" open>
+                          <summary><span class="material-symbols-outlined">ecg_heart</span> Sinais vitais <span class="material-symbols-outlined chev">expand_more</span></summary>
+                          <div class="acc-body">
+                            <div class="field-row-3">
+                              <div class="field-group"><label class="field-label" for="enf_pa">PA (mmHg)</label><input type="text" class="field-input" id="enf_pa" placeholder="120/80"></div>
+                              <div class="field-group"><label class="field-label" for="enf_temp">Temp. (°C)</label><input type="number" step="0.1" class="field-input" id="enf_temp"></div>
+                              <div class="field-group"><label class="field-label" for="enf_fc">FC (bpm)</label><input type="number" class="field-input" id="enf_fc"></div>
+                            </div>
+                            <div class="field-row-3">
+                              <div class="field-group"><label class="field-label" for="enf_fr">FR (irpm)</label><input type="number" class="field-input" id="enf_fr"></div>
+                              <div class="field-group"><label class="field-label" for="enf_spo2">SpO₂ (%)</label><input type="number" class="field-input" id="enf_spo2"></div>
+                              <div class="field-group"><label class="field-label" for="enf_glicemia">HGT (mg/dL)</label><input type="number" class="field-input" id="enf_glicemia"></div>
+                            </div>
+                          </div>
+                        </details>
+
+                        <details class="acc" open>
+                          <summary><span class="material-symbols-outlined">accessibility_new</span> Estado <span class="material-symbols-outlined chev">expand_more</span></summary>
+                          <div class="acc-body">
+                            <div class="check-grid" id="enfEstado"></div>
+                          </div>
+                        </details>
+
+                        <div class="field-group">
+                          <label class="field-label" for="enf_anotacao">Anotação de enfermagem <span class="req">*</span></label>
+                          <textarea class="field-textarea" id="enf_anotacao" placeholder="Descreva a evolução do paciente..." oninput="clearErr('enf_anotacao')"></textarea>
+                          <div class="field-error" id="err-enf_anotacao">Descreva a evolução</div>
+                        </div>
+
+                        <div class="field-group" id="enfMotivoWrap" style="display:none">
+                          <label class="field-label" for="enf_motivo">Motivo da retificação <span class="req">*</span></label>
+                          <input type="text" class="field-input" id="enf_motivo" placeholder="Ex.: correção do horário da medicação" oninput="clearErr('enf_motivo')">
+                          <div class="field-error" id="err-enf_motivo">Informe o motivo da retificação</div>
+                        </div>
+
+                        <div class="form-footer" style="margin:0 -18px">
+                          <button type="button" class="btn-cancel" onclick="fecharNovaEvolucao()">Cancelar</button>
+                          <button type="button" class="btn-save" onclick="saveEvolucaoEnf()">
+                            <span class="material-symbols-outlined">check_circle</span> <span id="enfSalvarTxt">Registrar evolução</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <details class="acc" id="aprazCard">
+                        <summary><span class="material-symbols-outlined">schedule</span> Aprazamento de medicações <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <p class="field-hint" style="margin:0 0 10px" id="aprazRef"></p>
+                          <div id="enfAprazamento"></div>
+                        </div>
+                      </details>
+
+                      <div class="acc-sub">Histórico de evoluções</div>
+                      <div class="hist-list" id="enfHist"></div>
+                    </div>
+                  </div>
+
+                  <!-- ===================== EVOLUÇÃO MÉDICA ===================== -->
+                  <div class="modal-tab-pane" id="tab-medica">
+                    <div class="tab-content">
+                      <div class="field-group">
+                        <label class="field-label">Diagnóstico inicial</label>
+                        <div class="field-input" id="medDiagInicial" style="background:#f0f2f8">—</div>
+                      </div>
+
+                      <div class="tab-toolbar">
+                        <div>
+                          <div class="new-entry-title" style="margin:0">Evoluções médicas</div>
+                          <p class="field-hint" style="margin:2px 0 0">Registre um novo acompanhamento ou finalize a internação abaixo.</p>
+                        </div>
+                        <button type="button" class="btn-new" id="btnNovaMed" onclick="abrirNovaEvolucaoMed()">
+                          <span class="material-symbols-outlined">add</span> Novo
+                        </button>
+                      </div>
+
+                      <!-- Formulário de novo acompanhamento: só aparece ao clicar em Novo -->
+                      <div class="nova-evol" id="medNovaForm" style="display:none">
+                        <div class="new-entry-title" id="medFormTitulo"><span class="material-symbols-outlined">add_circle</span> Novo acompanhamento médico</div>
+                        <div class="field-row-3">
+                          <div class="field-group"><label class="field-label" for="med_data">Data</label><input type="date" class="field-input" id="med_data"></div>
+                          <div class="field-group"><label class="field-label" for="med_hora">Hora</label><input type="time" class="field-input" id="med_hora"></div>
+                          <div class="field-group"><label class="field-label" for="med_medico">Médico <span class="req">*</span></label><select class="field-select" id="med_medico" onchange="clearErr('med_medico')"></select></div>
+                        </div>
+                        <div class="field-error" id="err-med_medico" style="margin:-8px 0 10px">Informe o médico</div>
+                        <div class="field-row">
+                          <div class="field-group">
+                            <label class="field-label" for="med_diagnostico">Hipótese diagnóstica</label>
+                            <textarea class="field-textarea" id="med_diagnostico"></textarea>
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="med_plano">Plano de cuidado</label>
+                            <textarea class="field-textarea" id="med_plano"></textarea>
+                          </div>
+                        </div>
+
+                        <details class="acc">
+                          <summary><span class="material-symbols-outlined">ecg_heart</span> Sinais vitais <span class="material-symbols-outlined chev">expand_more</span></summary>
+                          <div class="acc-body">
+                            <div class="field-row-3">
+                              <div class="field-group"><label class="field-label" for="med_pa">PA (mmHg)</label><input type="text" class="field-input" id="med_pa" placeholder="120/80"></div>
+                              <div class="field-group"><label class="field-label" for="med_temp">Temp. (°C)</label><input type="number" step="0.1" class="field-input" id="med_temp"></div>
+                              <div class="field-group"><label class="field-label" for="med_fc">FC (bpm)</label><input type="number" class="field-input" id="med_fc"></div>
+                            </div>
+                            <div class="field-row-3">
+                              <div class="field-group"><label class="field-label" for="med_fr">FR (irpm)</label><input type="number" class="field-input" id="med_fr"></div>
+                              <div class="field-group"><label class="field-label" for="med_spo2">SpO₂ (%)</label><input type="number" class="field-input" id="med_spo2"></div>
+                              <div class="field-group"><label class="field-label" for="med_peso">Peso (kg)</label><input type="number" step="0.1" class="field-input" id="med_peso"></div>
+                            </div>
+                          </div>
+                        </details>
+
+                        <div class="field-row">
+                          <div class="field-group">
+                            <label class="field-label" for="med_estado">Estado do paciente</label>
+                            <textarea class="field-textarea" id="med_estado" placeholder="Descreva o estado atual do paciente..."></textarea>
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="med_anotacoes">Anotações</label>
+                            <textarea class="field-textarea" id="med_anotacoes"></textarea>
+                          </div>
+                        </div>
+
+                        <details class="acc">
+                          <summary><span class="material-symbols-outlined">medication</span> Prescrição de medicamentos <span class="material-symbols-outlined chev">expand_more</span></summary>
+                          <div class="acc-body">
+                            <table class="cal-table">
+                              <thead><tr><th>Medicação</th><th>Posologia</th><th style="width:36px"></th></tr></thead>
+                              <tbody id="medPrescBody"></tbody>
+                            </table>
+                            <button type="button" class="btn-table-add" onclick="addRow('medPrescBody')" style="margin-bottom:12px">
+                              <span class="material-symbols-outlined" style="font-size:.95rem">add</span> Adicionar medicação
+                            </button>
+                          </div>
+                        </details>
+
+                        <details class="acc">
+                          <summary><span class="material-symbols-outlined">biotech</span> Solicitação de exames <span class="material-symbols-outlined chev">expand_more</span></summary>
+                          <div class="acc-body">
+                            <table class="cal-table">
+                              <thead><tr><th>Exame</th><th>Observação</th><th style="width:36px"></th></tr></thead>
+                              <tbody id="medExamesBody"></tbody>
+                            </table>
+                            <button type="button" class="btn-table-add" onclick="addRow('medExamesBody')" style="margin-bottom:12px">
+                              <span class="material-symbols-outlined" style="font-size:.95rem">add</span> Adicionar exame
+                            </button>
+                          </div>
+                        </details>
+
+                        <div class="field-group" id="medMotivoWrap" style="display:none">
+                          <label class="field-label" for="med_motivo">Motivo da retificação <span class="req">*</span></label>
+                          <input type="text" class="field-input" id="med_motivo" placeholder="Ex.: ajuste da posologia prescrita" oninput="clearErr('med_motivo')">
+                          <div class="field-error" id="err-med_motivo">Informe o motivo da retificação</div>
+                        </div>
+
+                        <div class="form-footer" style="margin:0 -18px">
+                          <button type="button" class="btn-cancel" onclick="fecharNovaEvolucaoMed()">Cancelar</button>
+                          <button type="button" class="btn-save" onclick="saveEvolucaoMed()">
+                            <span class="material-symbols-outlined">check_circle</span> <span id="medSalvarTxt">Registrar evolução médica</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="acc-sub">Histórico de acompanhamentos</div>
+                      <div class="hist-list" id="medHist"></div>
+
+                      <details class="acc saida-card" id="saidaCard">
+                        <summary><span class="material-symbols-outlined">logout</span> Finalizar internação / encaminhamento <span class="material-symbols-outlined chev">expand_more</span></summary>
+                        <div class="acc-body">
+                          <p class="field-hint" id="susStatus" style="margin:0 0 10px"></p>
+                          <div class="field-group">
+                            <label class="field-label" for="sai_medico">Médico responsável <span class="req">*</span></label>
+                            <select class="field-select" id="sai_medico" onchange="clearErr('sai_medico')"></select>
+                            <div class="field-error" id="err-sai_medico">Informe o médico</div>
+                          </div>
+
+                          <div class="field-group ac-wrap">
+                            <label class="field-label" for="sai_cid_busca">CID-10 principal <span class="req">*</span></label>
+                            <input type="text" class="field-input" id="sai_cid_busca" autocomplete="off" placeholder="Código ou descrição (ex.: J18.9 ou pneumonia)">
+                            <div class="sus-sel" id="saiCidSel" style="display:none"></div>
+                            <div class="field-error" id="err-sai_cid_busca">Escolha o CID na lista</div>
+                          </div>
+
+                          <div class="field-group ac-wrap">
+                            <label class="field-label" for="sai_proc_busca">Procedimento SUS realizado <span class="req">*</span></label>
+                            <input type="text" class="field-input" id="sai_proc_busca" autocomplete="off" placeholder="Escolha primeiro o CID" disabled>
+                            <div class="sus-sel" id="saiProcSel" style="display:none"></div>
+                            <div class="field-hint" id="saiProcHint"></div>
+                            <div class="field-error" id="err-sai_proc_busca">Escolha o procedimento na lista</div>
+                          </div>
+
+                          <div class="field-group">
+                            <label class="field-label" for="sai_motivo">Motivo <span class="req">*</span></label>
+                            <select class="field-select" id="sai_motivo" onchange="clearErr('sai_motivo'); atualizarObrigatoriosSaida()"></select>
+                            <div class="field-error" id="err-sai_motivo">Escolha o motivo</div>
+                            <div class="field-hint">Para encerrar a internação (alta, óbito, transferência…) o CID e o procedimento SUS são obrigatórios. Motivos de permanência ficam registrados e o paciente continua internado.</div>
+                          </div>
+                          <div class="modal-actions" style="justify-content:flex-end;margin-bottom:12px">
+                            <button type="button" class="btn-save btn-saida" onclick="registrarSaida()">
+                              <span class="material-symbols-outlined">logout</span> Registrar
+                            </button>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<div class="modal-overlay" id="modalAnularEvol" onclick="if (event.target === this) fecharAnularEvolucao()">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="anularEvolTitulo">
+    <div class="modal-icon"><span class="material-symbols-outlined">delete</span></div>
+    <h5 id="anularEvolTitulo">Excluir evolução?</h5>
+    <p>A evolução sai do histórico e deixa de valer (medicações, coletas, prescrições e exames registrados nela). Por exigência do prontuário, ela continua no documento do paciente marcada como excluída, com o motivo.</p>
+    <textarea class="field-textarea" id="anularEvolMotivo" placeholder="Motivo da exclusão" style="margin-bottom:16px;text-align:left" oninput="this.classList.remove('error')"></textarea>
+    <div class="modal-actions">
+      <button type="button" class="btn-mc" onclick="fecharAnularEvolucao()">Voltar</button>
+      <button type="button" class="btn-md" onclick="confirmarAnularEvolucao()"><span class="material-symbols-outlined" style="font-size:1rem">delete</span> Excluir evolução</button>
+    </div>
+  </div>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+<script src="./js/sus/sus.js"></script>
+<script src="./js/admissao-campos.js"></script>
+
+<script>
+// ===== CONSTANTS =====
+const TABELAS = {
+  medPrescBody:  { campos:['med','pos'],   placeholders:['Ex: Ceftriaxona 1g', 'Ex: EV 12/12h'] },
+  medExamesBody: { campos:['exame','obs'], placeholders:['Ex: Hemograma', 'Ex: em jejum'] },
+};
+
+
+
+// ===== STATE =====
+let atendimentos = Store.all();
+let selectedId   = null;
+let searchQuery  = '';
+let wardAtiva    = 'masculina';
+let leitoSel     = '';
+
+const internados = () => atendimentos.filter(isInternado).sort((x, y) => (x.data + x.hora).localeCompare(y.data + y.hora));
+const findAtend  = id => atendimentos.find(a => a.id === id);
+const intDe      = a => a.internacao || {};
+const admitido   = a => !!intDe(a).admissao?.salvaEm;
+// data/hora informada na admissão (registros antigos só têm a hora em que foi salva)
+const admissaoEm = a => intDe(a).admissao?.em || intDe(a).admissao?.salvaEm || '';
+
+// prescrições ativas: consulta + evoluções médicas (um item por medicamento).
+// "desde" é a referência do aprazamento: a admissão para o que veio da consulta, a evolução médica para o resto
+function prescricoesAtivas(a) {
+  const todas = [
+    ...(a.consulta.prescricao || []).map(p => ({ ...p, desde: admitido(a) ? admissaoEm(a) : '', origem: 'admissao' })),
+    ...evolucoesValidas(intDe(a).evolucoesMed).flatMap(e => (e.prescricao || []).map(p => ({ ...p, desde: e.em, origem: 'prescricao' }))),
+  ];
+  return todas.filter((p, i) => todas.findIndex(x => x.med === p.med) === i);
+}
+function examesAtivos(a) {
+  return [...(a.consulta.exames || []), ...evolucoesValidas(intDe(a).evolucoesMed).flatMap(e => e.exames || [])];
+}
+
+// ===== LEITOS =====
+function leitosOcupados(exceptId) {
+  const map = {};
+  atendimentos.filter(isInternado).forEach(a => {
+    const leito = intDe(a).admissao?.leito;
+    if (a.id !== exceptId && intDe(a).admissao?.salvaEm && leito) map[leito] = a.nome;
+  });
+  return map;
+}
+
+// alas que recebem o paciente (sexo e idade); a ala do leito já ocupado continua visível
+function alasDoPaciente(a) {
+  const alas = alasCompativeis(a.ident.sexo, calcAge(a.ident.nasc));
+  const atual = intDe(a).admissao?.leito?.split('-')[0];
+  return atual && !alas.includes(atual) ? [...alas, atual] : alas;
+}
+
+function renderLeitos() {
+  const a = findAtend(selectedId);
+  const ocupados = leitosOcupados(selectedId);
+  const alas = alasDoPaciente(a);
+  if (!alas.includes(wardAtiva)) wardAtiva = alas[0];
+  document.getElementById('wardTabs').innerHTML = alas.map(key =>
+    `<button type="button" class="chip ${key === wardAtiva ? 'active' : ''}" onclick="setWard('${key}')">${enfermarias()[key].nome}</button>`
+  ).join('');
+
+  const idade = calcAge(a.ident.nasc);
+  const perfil = [SEXOS[a.ident.sexo], idade !== null ? `${idade} anos` : ''].filter(Boolean).join(', ');
+  document.getElementById('wardPerfil').textContent = perfil
+    ? `Alas compatíveis com o paciente (${perfil}).`
+    : 'Sexo e idade não informados: todas as alas disponíveis.';
+
+  const ala = enfermarias()[wardAtiva];
+  document.getElementById('bedGrid').innerHTML = Array.from({ length: ala.leitos }, (_, i) => {
+    const id = `${wardAtiva}-${i + 1}`;
+    const ocupante = ocupados[id];
+    const sel = leitoSel === id;
+    return `<button type="button" class="bed ${sel ? 'selected' : ''}" ${ocupante ? 'disabled' : ''} onclick="setLeito('${id}')"
+              title="${ocupante ? 'Ocupado por ' + esc(ocupante) : 'Livre'}">
+              <span class="material-symbols-outlined">bed</span>
+              <strong>Leito ${String(i + 1).padStart(2, '0')}</strong>
+              <small>${sel ? 'Selecionado' : ocupante ? esc(ocupante) : 'Livre'}</small>
+            </button>`;
+  }).join('');
+
+  document.getElementById('leitoHint').textContent = leitoSel ? `Leito escolhido: ${leitoLabel(leitoSel)}` : 'Nenhum leito escolhido.';
+}
+
+function setWard(key) { wardAtiva = key; renderLeitos(); }
+
+function setLeito(id) {
+  leitoSel = id;
+  document.getElementById('err-leito').classList.remove('show');
+  renderLeitos();
+}
+
+// ===== FORMULÁRIO GENÉRICO (campos com name) =====
+function readForm(root) {
+  const data = {};
+  root.querySelectorAll('[name]').forEach(el => {
+    if (el.type === 'checkbox') { if (el.checked) data[el.name] = true; }
+    else if (el.type === 'radio') { if (el.checked) data[el.name] = el.value; }
+    else if (el.value.trim()) data[el.name] = el.value.trim();
+  });
+  return data;
+}
+
+function fillForm(root, data = {}) {
+  root.querySelectorAll('[name]').forEach(el => {
+    if (el.type === 'checkbox') el.checked = !!data[el.name];
+    else if (el.type === 'radio') el.checked = data[el.name] === el.value;
+    else el.value = data[el.name] ?? '';
+  });
+}
+
+// ===== EXAME FÍSICO =====
+function buildRegioes() {
+  document.getElementById('efRegioes').innerHTML = Object.entries(REGIOES).map(([key, r]) => `
+    <div class="ef-regiao" data-regiao="${key}" style="display:none">
+      ${r.grupos.map(g => `
+        <div class="acc-sub">${g.titulo}</div>
+        <div class="check-grid">
+          ${g.campos.filter(c => c.tipo === 'check').map(c =>
+            `<label class="check-chip"><input type="checkbox" name="ef_${key}_${c.nome}"> ${c.label}</label>`).join('')}
+        </div>
+        ${g.campos.filter(c => c.tipo === 'select').length ? `<div class="field-row-3">${g.campos.filter(c => c.tipo === 'select').map(c => `
+          <div class="field-group">
+            <label class="field-label">${c.label}</label>
+            <select class="field-select" name="ef_${key}_${c.nome}">
+              <option value="">Selecione...</option>
+              ${c.opcoes.map(o => `<option value="${slug(o)}">${o}</option>`).join('')}
+            </select>
+          </div>`).join('')}</div>` : ''}
+      `).join('')}
+      <div class="field-group">
+        <label class="field-label">Observações</label>
+        <textarea class="field-textarea" name="ef_${key}_obs"></textarea>
+      </div>
+    </div>`).join('');
+
+  document.querySelectorAll('.body-part').forEach(p => {
+    p.addEventListener('click', () => openRegiao(p.dataset.regiao));
+    p.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRegiao(p.dataset.regiao); } });
+  });
+}
+
+// região "informada" quando algum campo dela tem valor
+function regiaoPreenchida(key) {
+  return Object.entries(readForm(document.getElementById('efRegioes'))).some(([k]) => k.startsWith(`ef_${key}_`));
+}
+
+function renderBodyStatus() {
+  document.querySelectorAll('.body-part').forEach(p => p.classList.toggle('filled', regiaoPreenchida(p.dataset.regiao)));
+  document.getElementById('bodyLegend').innerHTML = Object.entries(REGIOES).map(([key, r]) => {
+    const ok = regiaoPreenchida(key);
+    return `<button type="button" class="${ok ? 'filled' : ''}" onclick="openRegiao('${key}')">
+              <span class="dot"></span>${r.titulo}<span class="status">${ok ? 'Informado' : 'Sem alterações registradas'}</span>
+            </button>`;
+  }).join('');
+}
+
+function openRegiao(key) {
+  document.getElementById('efTitle').textContent = `Exame físico — ${REGIOES[key].titulo}`;
+  document.querySelectorAll('.ef-regiao').forEach(r => r.style.display = r.dataset.regiao === key ? 'block' : 'none');
+  document.getElementById('efModal').classList.add('open');
+}
+
+function closeRegiao() {
+  document.getElementById('efModal').classList.remove('open');
+  renderBodyStatus();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('efModal').classList.contains('open')) closeRegiao();
+  document.querySelectorAll('.adm-modal.open').forEach(m => fecharModalAdm(m.id.replace('modal-', '')));
+});
+
+// ===== ADMISSÃO =====
+function updateImc() {
+  const peso = parseFloat(document.getElementById('antro_peso').value);
+  const altura = parseFloat(String(document.getElementById('antro_altura').value).replace(',', '.'));
+  document.getElementById('imcDisplay').textContent = peso > 0 && altura > 0 ? (peso / (altura * altura)).toFixed(1) : '—';
+}
+
+// ===== CARDS DA ADMISSÃO (formulários em modal) =====
+// os campos ficam dentro do formulário da admissão: são lidos e salvos junto com ele
+function abrirModalAdm(key) {
+  document.getElementById(`modal-${key}`).classList.add('open');
+  document.querySelector(`#modal-${key} input, #modal-${key} select, #modal-${key} textarea`)?.focus();
+}
+
+function fecharModalAdm(key) {
+  document.getElementById(`modal-${key}`).classList.remove('open');
+  renderAdmCards();
+}
+
+// resumo de cada card: quantos itens foram informados (e os sinais vitais por extenso)
+function renderAdmCards() {
+  ['habitos', 'historicos', 'estado', 'sinais'].forEach(key => {
+    const dados = readForm(document.getElementById(`modal-${key}`));
+    const n = Object.keys(dados).length;
+    const status = document.getElementById(`admCard-${key}`);
+    status.closest('.adm-card').classList.toggle('preenchido', n > 0);
+    if (key === 'sinais' && n) {
+      const imc = document.getElementById('imcDisplay').textContent;
+      status.textContent = [
+        dados.ssvv_pa && `PA ${dados.ssvv_pa}`, dados.ssvv_temp && `${dados.ssvv_temp} °C`,
+        dados.ssvv_fc && `FC ${dados.ssvv_fc}`, dados.ssvv_spo2 && `SpO₂ ${dados.ssvv_spo2}%`,
+        imc !== '—' && `IMC ${imc}`,
+      ].filter(Boolean).join(' · ') || `${n} ite${n > 1 ? 'ns' : 'm'} informado${n > 1 ? 's' : ''}`;
+    } else {
+      status.textContent = n ? `${n} ite${n > 1 ? 'ns' : 'm'} informado${n > 1 ? 's' : ''}` : 'Não informado';
+    }
+  });
+}
+
+// check-in da admissão: gravado na hora, como na Observação
+function renderAdmCheckins(a) {
+  const adm = intDe(a).admissao || {};
+  const lista = (itens, campo, tipo) => itens.length
+    ? itens.map((it, i) => {
+        const ck = adm[campo]?.[i] || {};
+        return `<label class="checkin-item ${ck.administrado ? 'done' : ''}">
+                  <input type="checkbox" ${ck.administrado ? 'checked' : ''} onchange="toggleAdmCheckin('${campo}', ${i}, this.checked)">
+                  <div class="checkin-info"><strong>${esc(it.med || it.exame)}</strong><span>${esc(it.pos || it.obs || '')}</span></div>
+                  <span class="checkin-time">${ck.administrado ? (tipo === 'med' ? 'Administrado' : 'Coletado') + ' às ' + esc(ck.hora) : ''}</span>
+                </label>`;
+      }).join('')
+    : `<p class="field-hint" style="margin:0 0 12px">${tipo === 'med' ? 'Nenhum medicamento prescrito na consulta.' : 'Nenhum exame solicitado na consulta.'}</p>`;
+  document.getElementById('admCheckMed').innerHTML   = lista(a.consulta.prescricao || [], 'checkinsMed', 'med');
+  document.getElementById('admCheckExame').innerHTML = lista(a.consulta.exames || [], 'checkinsExame', 'exame');
+}
+
+function toggleAdmCheckin(campo, i, marcado) {
+  const a = findAtend(selectedId);
+  const int = intDe(a);
+  const adm = { ...(int.admissao || {}) };
+  const lista = [...(adm[campo] || [])];
+  // quem fez e quando ficam no registro; desfazer também fica registrado
+  lista[i] = marcado
+    ? { administrado: true, hora: isoTime(new Date()), ...marcaAutoria() }
+    : { administrado: false, hora: '', desfeito: { ...marcaAutoria(), hora: lista[i]?.hora || '' } };
+  adm[campo] = lista;
+  Store.upsert({ id: a.id, internacao: { ...int, admissao: adm } });
+  atendimentos = Store.all();
+  renderAdmCheckins(findAtend(selectedId));
+  showToast(marcado ? '✅ Check-in registrado' : '↩️ Check-in desfeito');
+}
+
+function fillAdmissao(a) {
+  const adm = intDe(a).admissao || {};
+  const admForm = document.getElementById('admForm');
+  fillForm(admForm, adm.campos);
+  document.getElementById('admCarater').value = adm.carater || '02';
+  const quando = admissaoEm(a) || agora();
+  document.getElementById('admData').value = quando.slice(0, 10);
+  document.getElementById('admHora').value = quando.slice(11, 16);
+  ['admData', 'admHora'].forEach(clearErr);
+  leitoSel  = adm.leito || '';
+  wardAtiva = leitoSel ? leitoSel.split('-')[0] : alasDoPaciente(a)[0];
+  document.getElementById('err-leito').classList.remove('show');
+  document.getElementById('diagPrincipal').textContent = diagnosticoInicial(a) || '—';
+  renderLeitos();
+  renderAdmCheckins(a);
+  renderBodyStatus();
+  updateImc();
+  renderAdmCards();
+}
+
+function saveAdmissao() {
+  const a = findAtend(selectedId);
+  if (!a) return;
+  const data = document.getElementById('admData').value;
+  const hora = document.getElementById('admHora').value;
+  let ok = true;
+  if (!data) { showErr('admData'); ok = false; }
+  if (!hora) { showErr('admHora'); ok = false; }
+  if (!leitoSel) { document.getElementById('err-leito').classList.add('show'); ok = false; }
+  if (!ok) {
+    document.querySelector('#admForm details.acc').open = true;
+    showToast(leitoSel ? '⚠️ Informe a data e a hora da admissão' : '⚠️ Escolha um leito para a admissão');
+    return;
+  }
+  // o leito pode ter sido ocupado em outra aba enquanto o formulário estava aberto
+  atendimentos = Store.all();
+  const ocupante = leitosOcupados(a.id)[leitoSel];
+  if (ocupante) { showToast(`⚠️ ${leitoLabel(leitoSel)} já está ocupado por ${ocupante}`); renderLeitos(); return; }
+
+  const int = intDe(findAtend(a.id));
+  const primeira = !int.admissao?.salvaEm;
+  const admissao = {
+    ...(int.admissao || {}),
+    salvaEm: int.admissao?.salvaEm || agora(),
+    atualizadaEm: agora(),
+    em: `${data}T${hora}`,
+    leito: leitoSel,
+    carater: document.getElementById('admCarater').value,
+    campos: readForm(document.getElementById('admForm')),
+  };
+  const dadosAdm = x => x && { em: x.em, leito: x.leito, carater: x.carater, campos: x.campos };
+  admissao.reg = autoria(dadosAdm(admissao), dadosAdm(int.admissao), int.admissao?.reg);
+  Store.upsert({ id: a.id, internacao: { ...int, admissao } });
+  atendimentos = Store.all();
+  showToast(primeira ? '✅ Admissão salva — evoluções liberadas' : '✅ Admissão atualizada');
+  refreshSelected();
+}
+
+// ===== APRAZAMENTO =====
+const JANELA_ALERTA = 30;  // minutos antes do horário em que o alerta aparece na lista
+let aprazItens = [];       // medicamentos ativos, na ordem dos índices usados nos checkboxes
+
+const minutosDe = hhmm => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+const horaDoMinuto = t => ((t / 60 - 1) % 24) + 1;   // 1440 -> 24, 1800 -> 6
+
+// Referência do aprazamento:
+// - medicação da consulta: a 1ª dose é dada na admissão; a próxima é o horário da tabela mais próximo de "admissão + intervalo"
+// - medicação prescrita na evolução médica: a 1ª dose é o próximo horário da tabela depois da prescrição
+function alvoDaProxima(item, intervalo) {
+  const ref = minutosDe(item.desde.slice(11, 16));
+  return { ref, alvo: item.origem === 'admissao' ? ref + Number(intervalo) * 60 : ref };
+}
+
+// dose (em minutos desde 00:00 do dia da referência) mais próxima do alvo, entre os horários dados
+function melhorDose(horas, ref, alvo) {
+  let melhor = null;
+  horas.forEach(h => [h * 60, h * 60 + 1440].forEach(t => {
+    if (t <= ref) return;
+    const d = Math.abs(t - alvo);
+    if (!melhor || d < melhor.d || (d === melhor.d && t < melhor.t)) melhor = { d, t, h };
+  }));
+  return melhor;
+}
+
+function inicioPorReferencia(intervalo, item) {
+  const { ref, alvo } = alvoDaProxima(item, intervalo);
+  let escolha = null;
+  APRAZAMENTO[intervalo].inicios.forEach(s => {
+    const m = melhorDose(horariosAprazamento(intervalo, s), ref, alvo);
+    if (m && (!escolha || m.d < escolha.d || (m.d === escolha.d && m.t < escolha.t))) escolha = { ...m, s };
+  });
+  // prefere a linha da tabela que começa justamente na próxima dose
+  const proxima = horaDoMinuto(escolha.t);
+  return APRAZAMENTO[intervalo].inicios.includes(proxima) ? proxima : escolha.s;
+}
+
+// primeira dose prevista (minutos a partir de 00:00 do dia da referência) para o aprazamento em uso
+function primeiraDose(item, intervalo, inicio) {
+  const { ref, alvo } = alvoDaProxima(item, intervalo);
+  return melhorDose(horariosAprazamento(intervalo, inicio), ref, alvo).t;
+}
+
+// intervalo e início: o que foi salvo para o paciente, ou o padrão a partir da admissão/prescrição
+function aprazamentoDe(a, item) {
+  const salvo = intDe(a).aprazamentos?.[item.med];
+  const intervalo = salvo?.intervalo ?? intervaloDaPosologia(item.pos);
+  let inicio = null;
+  if (APRAZAMENTO[intervalo]) {
+    inicio = salvo?.inicio ?? (item.desde ? inicioPorReferencia(intervalo, item) : inicioPadrao(intervalo, new Date().getHours()));
+  }
+  return { intervalo, inicio };
+}
+
+// doses registradas nas evoluções: horários fixos e "se necessário" contam no dia; dose única em qualquer dia
+function dosesRegistradas(a, med, data) {
+  return (intDe(a).evolucoesEnf || []).flatMap((e, idx) => (e.anulada ? [] : e.administracoes || [])
+      .filter(d => d.med === med && (d.horario === 'DU' || e.em.slice(0, 10) === data))
+      .map(d => ({ ...d, n: idx + 1, data: e.em.slice(0, 10) })));
+}
+
+// doses aprazadas do dia; antes da primeira dose prevista não há dose a cobrar
+function agendaDoDia(a, data) {
+  aprazItens = prescricoesAtivas(a);
+  const agenda = [];
+  aprazItens.forEach((item, idx) => {
+    const { intervalo, inicio } = aprazamentoDe(a, item);
+    if (!APRAZAMENTO[intervalo] || !item.desde) return;
+    const dias = Math.round((new Date(data + 'T12:00') - new Date(item.desde.slice(0, 10) + 'T12:00')) / 86400000);
+    if (dias < 0) return;
+    const primeira = primeiraDose(item, intervalo, inicio);
+    const feitas = dosesRegistradas(a, item.med, data);
+    horariosAprazamento(intervalo, inicio).forEach(h => {
+      const min = h * 60;
+      if (dias * 1440 + min < primeira) return;
+      const horario = fmtHorario(h);
+      agenda.push({ item, idx, horario, min, reg: feitas.find(d => d.horario === horario) });
+    });
+  });
+  return agenda.sort((x, y) => x.min - y.min);
+}
+
+// alerta da lista: dose pendente de hoje que já passou ou vence nos próximos minutos
+function pendenciaAlerta(a, agoraDt = new Date()) {
+  if (!admitido(a)) return null;
+  const nowMin = agoraDt.getHours() * 60 + agoraDt.getMinutes();
+  const pend = agendaDoDia(a, isoDate(agoraDt)).filter(d => !d.reg && d.min <= nowMin + JANELA_ALERTA);
+  if (!pend.length) return null;
+  const { horario, min } = pend[0];
+  return { horario, atrasada: min < nowMin, qtd: pend.filter(d => d.horario === horario).length };
+}
+
+function renderEnfHint(a) {
+  const hint = document.getElementById('enfProxima');
+  const alerta = pendenciaAlerta(a);
+  if (alerta) {
+    hint.innerHTML = `<span class="med-alert ${alerta.atrasada ? 'late' : ''}">💊 ${alerta.horario}</span> ${alerta.qtd} medicaç${alerta.qtd > 1 ? 'ões' : 'ão'} ${alerta.atrasada ? 'atrasada' + (alerta.qtd > 1 ? 's' : '') : 'para administrar'}`;
+    return;
+  }
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const prox = agendaDoDia(a, isoDate(new Date())).find(d => !d.reg && d.min > nowMin);
+  hint.textContent = prox ? `Próxima medicação às ${prox.horario}.` : 'Sem medicações aprazadas pendentes hoje.';
+}
+
+// mapa do dia: configuração do aprazamento e situação de cada horário
+function renderAprazamento(a) {
+  const wrap = document.getElementById('enfAprazamento');
+  const hoje = isoDate(new Date());
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const agenda = agendaDoDia(a, hoje);
+  document.getElementById('aprazRef').textContent = admitido(a)
+    ? `Medicações da consulta: 1ª dose na admissão (${fmtDataHora(admissaoEm(a))}) e as demais pela tabela de aprazamento. Medicações da evolução médica: a partir do próximo horário da tabela após a prescrição.`
+    : '';
+
+  if (!aprazItens.length) { wrap.innerHTML = '<p class="field-hint" style="margin:0 0 12px">Nada prescrito.</p>'; return; }
+
+  wrap.innerHTML = aprazItens.map((item, i) => {
+    const { intervalo, inicio } = aprazamentoDe(a, item);
+    let corpo;
+    if (APRAZAMENTO[intervalo]) {
+      const hs = horariosAprazamento(intervalo, inicio);
+      const seq = intervalo === '24' ? `${fmtHorario(hs[0])} — 01 vez ao dia`
+        : (['6', '8'].includes(intervalo) ? [...hs, hs[0]] : hs).map(fmtHorario).join('-');
+      const doDia = agenda.filter(d => d.idx === i);
+      corpo = `<div class="apraz-seq">${seq}</div>
+        <div class="apraz-horarios">${doDia.length ? doDia.map(d => d.reg
+          ? `<span class="dose-chip feita" title="Evolução #${d.reg.n}">✓ ${d.horario} <small>#${d.reg.n} · ${esc(d.reg.registradoEm)}</small></span>`
+          : `<span class="dose-chip ${d.min < nowMin ? 'atrasada' : 'pendente'}">${d.min < nowMin ? '⚠ ' : ''}${d.horario}</span>`).join('')
+          : '<span class="field-hint">Sem doses previstas hoje.</span>'}</div>`;
+    } else if (APRAZ_ESPECIAIS[intervalo]) {
+      corpo = `<p class="field-hint" style="margin:8px 0 0">${APRAZ_ESPECIAIS[intervalo]}: registrado na nova evolução, sem horário fixo.</p>`;
+    } else {
+      corpo = '<p class="field-hint" style="margin:8px 0 0">Defina o intervalo para aprazar os horários.</p>';
+    }
+
+    return `<div class="apraz-item">
+      <div class="apraz-head">
+        <div class="apraz-med"><strong>${esc(item.med)}</strong><small>${esc(item.pos || '')}</small></div>
+        <div class="apraz-selects">
+          <select class="field-select" onchange="setAprazamento(${i}, this.value, null)" aria-label="Intervalo de ${esc(item.med)}">
+            <option value="" ${intervalo ? '' : 'selected'}>Intervalo...</option>
+            ${Object.entries(APRAZAMENTO).map(([k, v]) => `<option value="${k}" ${k === intervalo ? 'selected' : ''}>${v.label}</option>`).join('')}
+            ${Object.entries(APRAZ_ESPECIAIS).map(([k, v]) => `<option value="${k}" ${k === intervalo ? 'selected' : ''}>${v}</option>`).join('')}
+          </select>
+          ${APRAZAMENTO[intervalo] ? `
+          <select class="field-select" onchange="setAprazamento(${i}, '${intervalo}', Number(this.value))" aria-label="Início de ${esc(item.med)}">
+            ${APRAZAMENTO[intervalo].inicios.map(h => `<option value="${h}" ${h === inicio ? 'selected' : ''}>Início ${fmtHorario(h)}</option>`).join('')}
+          </select>` : ''}
+        </div>
+      </div>
+      ${corpo}
+    </div>`;
+  }).join('');
+}
+
+// o aprazamento vale para o paciente todo: é gravado na hora
+function setAprazamento(i, intervalo, inicio) {
+  const a = findAtend(selectedId);
+  const item = aprazItens[i];
+  const int = intDe(a);
+  const novo = { intervalo, inicio: null, ...marcaAutoria() };
+  if (APRAZAMENTO[intervalo]) novo.inicio = inicio ?? (item.desde ? inicioPorReferencia(intervalo, item) : inicioPadrao(intervalo, new Date().getHours()));
+  Store.upsert({ id: a.id, internacao: { ...int, aprazamentos: { ...(int.aprazamentos || {}), [item.med]: novo } } });
+  atendimentos = Store.all();
+  const atual = findAtend(selectedId);
+  renderAprazamento(atual);
+  renderEnfHint(atual);
+  renderList();
+  if (document.getElementById('enfNovaForm').style.display !== 'none') renderSlotOptions();
+  showToast(`🕒 Aprazamento de ${item.med}: ${APRAZAMENTO[intervalo] ? horariosAprazamento(intervalo, novo.inicio).map(fmtHorario).join('-') : APRAZ_ESPECIAIS[intervalo] || 'sem intervalo'}`);
+}
+
+// ===== EVOLUÇÃO DE ENFERMAGEM =====
+function vitalPills(s = {}) {
+  const itens = [['PA', s.pa, ''], ['Temp.', s.temp, ' °C'], ['FC', s.fc, ' bpm'], ['FR', s.fr, ' irpm'], ['SpO₂', s.spo2, '%'], ['HGT', s.glicemia, ' mg/dL'], ['Peso', s.peso, ' kg']]
+    .filter(([, v]) => v);
+  return itens.length ? `<div class="vital-row">${itens.map(([l, v, u]) => `<span class="vital-pill">${l} ${esc(v)}${u}</span>`).join('')}</div>` : '';
+}
+
+// ===== EDITAR E EXCLUIR EVOLUÇÕES =====
+// a edição guarda a versão anterior (retificação); a exclusão anula a evolução, que continua no prontuário
+let editEvol = { enf: null, med: null }; // índice da evolução em edição em cada aba
+let anulando = null;                      // { tipo, k } da evolução no modal de exclusão
+const CHAVE_EVOL = { enf: 'evolucoesEnf', med: 'evolucoesMed' };
+const NOME_EVOL = { enf: 'evolução de enfermagem', med: 'evolução médica' };
+
+// botões do histórico (só para quem lançou a evolução e o administrador)
+function acoesEvolucao(tipo, k, e) {
+  if (!podeAlterarRegistro(e)) return '';
+  const btn = (acao, icone, rotulo, classe = '') => `<button type="button" class="hist-btn ${classe}" title="${rotulo} a ${NOME_EVOL[tipo]} #${k + 1}"
+      onclick="event.preventDefault(); event.stopPropagation(); ${acao}('${tipo}', ${k})"><span class="material-symbols-outlined">${icone}</span>${rotulo}</button>`;
+  return `<span class="hist-acoes">${btn('editarEvolucao', 'edit', 'Editar')}${btn('abrirAnularEvolucao', 'delete', 'Excluir', 'perigo')}</span>`;
+}
+
+// retificações: quem alterou, quando, o motivo e o que mudou em cada versão
+function retificacoesHtml(e, tipo) {
+  const r = e.retificacoes || [];
+  if (!r.length) return '';
+  return `<details class="hist-versoes"><summary><span class="material-symbols-outlined">history_edu</span> Retificada ${r.length > 1 ? r.length + ' vezes' : ''} — ver alterações</summary>
+    ${r.map((x, i) => `<div class="hist-versao"><strong>${esc(fmtDataHora(x.em))} · ${esc(x.por?.nome || 'Autor não identificado')}</strong>${x.motivo ? ` — ${esc(x.motivo)}` : ''}
+      ${diferencasEvolucao(x.anterior, r[i + 1]?.anterior || e, tipo).map(([l, antes, depois]) =>
+        `<div class="hist-dif"><span class="lbl">${esc(l)}</span><del>${esc(antes || '(vazio)')}</del><ins>${esc(depois || '(vazio)')}</ins></div>`).join('')}</div>`).join('')}
+  </details>`;
+}
+
+const anuladasHtml = lista => {
+  const n = (lista || []).filter(e => e.anulada).length;
+  return n ? `<p class="hist-empty hist-anuladas"><span class="material-symbols-outlined">delete</span> ${n} evoluç${n > 1 ? 'ões excluídas' : 'ão excluída'} — constam no prontuário com o motivo.</p>` : '';
+};
+
+function editarEvolucao(tipo, k) {
+  const e = intDe(findAtend(selectedId))[CHAVE_EVOL[tipo]]?.[k];
+  if (!e || e.anulada) return;
+  if (!podeAlterarRegistro(e)) { showToast('⚠️ Só quem lançou a evolução ou o administrador pode editá-la'); return; }
+  if (tipo === 'enf') abrirNovaEvolucao(undefined, k); else abrirNovaEvolucaoMed(k);
+}
+
+function abrirAnularEvolucao(tipo, k) {
+  const e = intDe(findAtend(selectedId))[CHAVE_EVOL[tipo]]?.[k];
+  if (!e || e.anulada) return;
+  if (!podeAlterarRegistro(e)) { showToast('⚠️ Só quem lançou a evolução ou o administrador pode excluí-la'); return; }
+  anulando = { tipo, k };
+  document.getElementById('anularEvolTitulo').textContent = `Excluir a ${NOME_EVOL[tipo]} #${k + 1}?`;
+  document.getElementById('anularEvolMotivo').value = '';
+  document.getElementById('anularEvolMotivo').classList.remove('error');
+  document.getElementById('modalAnularEvol').classList.add('open');
+  document.getElementById('anularEvolMotivo').focus();
+}
+function fecharAnularEvolucao() { document.getElementById('modalAnularEvol').classList.remove('open'); anulando = null; }
+function confirmarAnularEvolucao() {
+  const motivo = document.getElementById('anularEvolMotivo').value.trim();
+  if (!motivo) { document.getElementById('anularEvolMotivo').classList.add('error'); showToast('⚠️ Informe o motivo da exclusão'); return; }
+  const { tipo, k } = anulando;
+  const a = findAtend(selectedId), int = intDe(a), lista = [...(int[CHAVE_EVOL[tipo]] || [])];
+  lista[k] = { ...lista[k], anulada: { ...marcaAutoria(), motivo } };
+  Store.upsert({ id: a.id, internacao: { ...int, [CHAVE_EVOL[tipo]]: lista } });
+  atendimentos = Store.all();
+  fecharAnularEvolucao();
+  showToast(`🗑️ ${NOME_EVOL[tipo].charAt(0).toUpperCase() + NOME_EVOL[tipo].slice(1)} #${k + 1} excluída`);
+  refreshSelected();
+}
+
+// cópia da evolução sem o histórico, guardada como versão anterior
+const conteudoEvolucao = e => { const { retificacoes, anulada, ...resto } = e; return resto; };
+function retificar(orig, nova, tipo, motivo) {
+  return { ...nova, por: orig.por, salvoEm: orig.salvoEm,
+    retificacoes: [...(orig.retificacoes || []), { ...marcaAutoria(), motivo, anterior: conteudoEvolucao(orig) }] };
+}
+
+function renderEnfHist(a) {
+  const lista = intDe(a).evolucoesEnf || [];
+  const validas = lista.map((e, i) => ({ e, n: i + 1 })).filter(({ e }) => !e.anulada);
+  document.getElementById('enfHist').innerHTML = (validas.length ? validas.reverse().map(({ e, n }, idx) => {
+    const estado = Object.entries(ESTADO_ENF).filter(([k]) => e.estado?.[k]).map(([, l]) => l);
+    return `<details class="hist" ${idx === 0 ? 'open' : ''}>
+      <summary><span class="hist-num">#${n}</span><span class="hist-when">${esc(fmtDataHora(e.em))}</span>
+        <span class="hist-who">${esc(e.profissional || '')}</span>
+        ${e.acompanhamento ? `<span class="stage-pill done">${ACOMP_LABELS[e.acompanhamento]}</span>` : ''}
+        ${e.retificacoes?.length ? '<span class="stage-pill pending">Retificada</span>' : ''}
+        ${acoesEvolucao('enf', n - 1, e)}</summary>
+      <div class="hist-body">
+        ${vitalPills(e.ssvv)}
+        ${estado.length ? `<span class="lbl">Estado</span><p>${esc(estado.join(' · '))}</p>` : ''}
+        ${e.administracoes?.length ? `<span class="lbl">Medicamentos administrados</span><p>${esc(e.administracoes.map(d =>
+          `${d.med} — ${d.horario === 'DU' ? 'dose única' : d.horario === 'SN' ? 'se necessário' : 'horário ' + d.horario} (às ${d.registradoEm})`).join('\n'))}</p>` : ''}
+        ${e.medsAdministrados?.length ? `<span class="lbl">Medicamentos administrados</span><p>${esc(e.medsAdministrados.join(', '))}</p>` : ''}
+        ${e.examesColetados?.length ? `<span class="lbl">Exames coletados</span><p>${esc(e.examesColetados.join(', '))}</p>` : ''}
+        <span class="lbl">Anotação</span><p>${esc(e.anotacao)}</p>
+        ${retificacoesHtml(e, 'enf')}
+      </div>
+    </details>`;
+  }).join('') : '<p class="hist-empty">Nenhuma evolução registrada.</p>') + anuladasHtml(lista);
+}
+
+// ao trocar de paciente ou salvar: formulário fechado, mapa e aviso atualizados
+function resetEnfForm(a) {
+  fecharNovaEvolucao();
+  renderAprazamento(a);
+  renderEnfHint(a);
+}
+
+function fecharNovaEvolucao() {
+  document.getElementById('enfNovaForm').style.display = 'none';
+  document.getElementById('btnNovaEnf').disabled = false;
+  editEvol.enf = null;
+}
+
+// título, botão e motivo do formulário conforme for um registro novo ou a edição da evolução "k"
+function modoFormEvolucao(tipo, k) {
+  const editando = k != null;
+  document.getElementById(`${tipo}FormTitulo`).innerHTML = editando
+    ? `<span class="material-symbols-outlined">edit</span> Editar ${NOME_EVOL[tipo]} #${k + 1}`
+    : `<span class="material-symbols-outlined">add_circle</span> ${tipo === 'enf' ? 'Nova evolução de enfermagem' : 'Novo acompanhamento médico'}`;
+  document.getElementById(`${tipo}SalvarTxt`).textContent = editando ? 'Salvar alterações' : tipo === 'enf' ? 'Registrar evolução' : 'Registrar evolução médica';
+  document.getElementById(`${tipo}MotivoWrap`).style.display = editando ? 'block' : 'none';
+  document.getElementById(`${tipo}_motivo`).value = '';
+  clearErr(`${tipo}_motivo`);
+}
+
+// abre o formulário; "horario" vem do alerta da lista e já seleciona o horário da medicação; "k" edita a evolução existente
+function abrirNovaEvolucao(horario, k = null) {
+  const a = findAtend(selectedId);
+  const e = k != null ? intDe(a).evolucoesEnf[k] : null;
+  editEvol.enf = k;
+  modoFormEvolucao('enf', k);
+  const now = new Date();
+  document.getElementById('enf_data').value = e ? e.em.slice(0, 10) : isoDate(now);
+  document.getElementById('enf_hora').value = e ? e.em.slice(11, 16) : isoTime(now);
+  const sv = e?.ssvv || {};
+  [['enf_pa', sv.pa], ['enf_temp', sv.temp], ['enf_fc', sv.fc], ['enf_fr', sv.fr], ['enf_spo2', sv.spo2], ['enf_glicemia', sv.glicemia], ['enf_anotacao', e?.anotacao]]
+    .forEach(([id, v]) => document.getElementById(id).value = v || '');
+  preencherProfissionais(document.getElementById('enf_profissional'), { niveis: ['enfermagem'], ...(e ? { id: e.profissionalId ?? null, texto: e.profissional || '' } : {}) });
+  document.querySelectorAll('input[name="enf_acomp"]').forEach(r => r.checked = !!e && r.value === e.acompanhamento);
+  ['enf_anotacao', 'enf_profissional'].forEach(clearErr);
+
+  document.getElementById('enfEstado').innerHTML = Object.entries(ESTADO_ENF).map(([chave, l]) =>
+    `<label class="check-chip"><input type="checkbox" data-estado="${chave}" ${e?.estado?.[chave] ? 'checked' : ''}> ${l}</label>`).join('');
+  renderColetas(a);
+  renderSlotOptions(horario ?? e?.administracoes?.find(d => !['DU', 'SN'].includes(d.horario))?.horario);
+
+  document.getElementById('enfNovaForm').style.display = 'block';
+  document.getElementById('btnNovaEnf').disabled = true;
+  document.getElementById('enfNovaForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// coletas: só os exames que ainda não foram coletados
+function renderColetas(a) {
+  const adm = intDe(a).admissao || {};
+  const evols = intDe(a).evolucoesEnf || [];
+  const meus = new Set(editEvol.enf != null ? evols[editEvol.enf]?.examesColetados || [] : []);
+  const coletados = new Set([
+    ...evols.flatMap((e, k) => (e.anulada || k === editEvol.enf ? [] : e.examesColetados || [])),
+    ...(a.consulta.exames || []).filter((_, i) => adm.checkinsExame?.[i]?.administrado).map(e => e.exame),
+  ]);
+  const pendentes = [...new Set([...examesAtivos(a).map(e => e.exame), ...meus])].filter(x => !coletados.has(x));
+  document.getElementById('enfCheckExame').innerHTML = pendentes.length
+    ? pendentes.map(x => `<label class="check-chip"><input type="checkbox" value="${esc(x)}" ${meus.has(x) ? 'checked' : ''}> ${esc(x)}</label>`).join('')
+    : '<p class="field-hint" style="margin:0">Nenhuma coleta pendente.</p>';
+}
+
+// horários do dia com medicação; o padrão é o do alerta, senão o próximo pendente
+function renderSlotOptions(preferido) {
+  const a = findAtend(selectedId);
+  const data = document.getElementById('enf_data').value || isoDate(new Date());
+  const agenda = agendaDoDia(a, data);
+  const slots = [...new Map(agenda.map(d => [d.horario, d.min])).entries()];
+  const sel = document.getElementById('enfSlot');
+
+  if (!slots.length) {
+    sel.innerHTML = '<option value="">Sem medicações aprazadas</option>';
+  } else {
+    const alerta = data === isoDate(new Date()) ? pendenciaAlerta(a) : null;
+    const pendente = agenda.find(d => !d.reg);
+    const padrao = [preferido, alerta?.horario, pendente?.horario].find(h => h && slots.some(([s]) => s === h)) || slots[0][0];
+    sel.innerHTML = slots.map(([h]) => {
+      const doSlot = agenda.filter(d => d.horario === h);
+      const falta = doSlot.filter(d => !d.reg).length;
+      return `<option value="${h}" ${h === padrao ? 'selected' : ''}>${h} — ${falta ? `${falta} a administrar` : 'concluído'}</option>`;
+    }).join('');
+  }
+  renderDosesSlot();
+}
+
+// mostra só as medicações do horário escolhido (+ "se necessário" e dose única à parte)
+function renderDosesSlot() {
+  const a = findAtend(selectedId);
+  const data = document.getElementById('enf_data').value || isoDate(new Date());
+  const slot = document.getElementById('enfSlot').value;
+  const agenda = agendaDoDia(a, data).filter(d => d.horario === slot);
+  const minha = d => d?.n - 1 === editEvol.enf; // dose registrada na evolução em edição
+
+  document.getElementById('enfDoses').innerHTML = agenda.length ? agenda.map(d => d.reg && minha(d.reg)
+    ? `<label class="checkin-item done">
+         <input type="checkbox" checked data-dose="${d.idx}|${d.horario}" onchange="this.closest('.checkin-item').classList.toggle('done', this.checked)">
+         <div class="checkin-info"><strong>${esc(d.item.med)}</strong><span>${esc(d.item.pos || '')}</span></div>
+         <span class="checkin-time">Registrado às ${esc(d.reg.registradoEm)} (esta evolução)</span></label>`
+    : d.reg
+    ? `<div class="checkin-item done"><input type="checkbox" checked disabled>
+         <div class="checkin-info"><strong>${esc(d.item.med)}</strong><span>${esc(d.item.pos || '')}</span></div>
+         <span class="checkin-time">Registrado às ${esc(d.reg.registradoEm)} (#${d.reg.n})</span></div>`
+    : `<label class="checkin-item">
+         <input type="checkbox" data-dose="${d.idx}|${d.horario}" onchange="this.closest('.checkin-item').classList.toggle('done', this.checked)">
+         <div class="checkin-info"><strong>${esc(d.item.med)}</strong><span>${esc(d.item.pos || '')}</span></div>
+         <span class="checkin-time">${d.horario}</span></label>`).join('')
+    : '<p class="field-hint" style="margin:0 0 12px">Nenhuma medicação aprazada neste horário.</p>';
+
+  // "se necessário" e dose única não têm horário fixo
+  const extras = aprazItens.map((item, idx) => ({ item, idx, ...aprazamentoDe(a, item) })).filter(x => APRAZ_ESPECIAIS[x.intervalo]);
+  document.getElementById('enfExtrasWrap').style.display = extras.length ? 'block' : 'none';
+  document.getElementById('enfDosesExtra').innerHTML = extras.map(({ item, idx, intervalo }) => {
+    const feitas = dosesRegistradas(a, item.med, data);
+    const unicaFeita = intervalo === 'unica' && feitas.find(d => d.horario === 'DU');
+    const tag = intervalo === 'unica' ? 'DU' : 'SN';
+    const marcada = feitas.some(d => d.horario === tag && minha(d));
+    return unicaFeita && !minha(unicaFeita)
+      ? `<div class="checkin-item done"><input type="checkbox" checked disabled>
+           <div class="checkin-info"><strong>${esc(item.med)}</strong><span>Dose única</span></div>
+           <span class="checkin-time">Registrada em ${fmtData(unicaFeita.data)} às ${esc(unicaFeita.registradoEm)}</span></div>`
+      : `<label class="checkin-item ${marcada ? 'done' : ''}">
+           <input type="checkbox" data-dose="${idx}|${tag}" ${marcada ? 'checked' : ''} onchange="this.closest('.checkin-item').classList.toggle('done', this.checked)">
+           <div class="checkin-info"><strong>${esc(item.med)}</strong><span>${esc(item.pos || '')} · ${APRAZ_ESPECIAIS[intervalo]}</span></div>
+           <span class="checkin-time">${feitas.filter(d => d.horario === 'SN' && !minha(d)).map(d => esc(d.registradoEm)).join(', ')}</span></label>`;
+  }).join('');
+}
+
+function saveEvolucaoEnf() {
+  const a = findAtend(selectedId);
+  const k = editEvol.enf;
+  const orig = k != null ? intDe(a).evolucoesEnf[k] : null;
+  const anotacao = document.getElementById('enf_anotacao').value.trim();
+  const profissional = lerProfissional(document.getElementById('enf_profissional'));
+  const motivo = document.getElementById('enf_motivo').value.trim();
+  if (!profissional.texto) { showErr('enf_profissional'); showToast('⚠️ Escolha o profissional'); return; }
+  if (!anotacao) { showErr('enf_anotacao'); showToast('⚠️ Descreva a evolução'); return; }
+  if (orig && !motivo) { showErr('enf_motivo'); showToast('⚠️ Informe o motivo da retificação'); return; }
+
+  const val = id => document.getElementById(id).value.trim();
+  const marcados = sel => [...document.querySelectorAll(sel)].filter(i => i.checked && !i.disabled);
+  const hora = val('enf_hora') || isoTime(new Date());
+  const entry = {
+    em: `${val('enf_data') || isoDate(new Date())}T${hora}`,
+    profissional: profissional.texto,
+    profissionalId: profissional.id,
+    salvoEm: agora(),
+    por: autorAtual(),
+    acompanhamento: document.querySelector('input[name="enf_acomp"]:checked')?.value || '',
+    administracoes: marcados('#enfNovaForm input[data-dose]').map(i => {
+      const [idx, horario] = i.dataset.dose.split('|');
+      const med = aprazItens[idx].med;
+      // na edição, a dose que já estava registrada mantém a hora do registro
+      const antes = orig?.administracoes?.find(d => d.med === med && d.horario === horario);
+      return { med, horario, registradoEm: antes?.registradoEm || hora };
+    }),
+    examesColetados: marcados('#enfCheckExame input').map(i => i.value),
+    ssvv: { pa: val('enf_pa'), temp: val('enf_temp'), fc: val('enf_fc'), fr: val('enf_fr'), spo2: val('enf_spo2'), glicemia: val('enf_glicemia') },
+    estado: Object.fromEntries([...document.querySelectorAll('#enfEstado input')].map(i => [i.dataset.estado, i.checked])),
+    anotacao,
+  };
+  const int = intDe(a);
+  if (orig) {
+    // doses desta evolução que não aparecem no horário escolhido no formulário continuam registradas
+    const exibidas = new Set([...document.querySelectorAll('#enfNovaForm input[data-dose]')].map(i => {
+      const [idx, horario] = i.dataset.dose.split('|');
+      return `${aprazItens[idx].med}|${horario}`;
+    }));
+    entry.administracoes = [...(orig.administracoes || []).filter(d => !exibidas.has(`${d.med}|${d.horario}`)), ...entry.administracoes];
+    if (!diferencasEvolucao(orig, entry, 'enf').length) { showToast('Nenhuma alteração na evolução'); fecharNovaEvolucao(); return; }
+    const lista = [...int.evolucoesEnf];
+    lista[k] = retificar(orig, entry, 'enf', motivo);
+    Store.upsert({ id: a.id, internacao: { ...int, evolucoesEnf: lista } });
+    atendimentos = Store.all();
+    showToast(`✏️ Evolução #${k + 1} retificada`);
+    refreshSelected();
+    return;
+  }
+  // fixa o aprazamento em uso para os horários não mudarem nas próximas evoluções
+  const aprazamentos = { ...(int.aprazamentos || {}) };
+  prescricoesAtivas(a).forEach(item => {
+    if (!aprazamentos[item.med]) aprazamentos[item.med] = { ...aprazamentoDe(a, item), padrao: true, ...marcaAutoria() };
+  });
+  Store.upsert({ id: a.id, internacao: { ...int, aprazamentos, evolucoesEnf: [...(int.evolucoesEnf || []), entry] } });
+  atendimentos = Store.all();
+  showToast(`✅ Evolução registrada${entry.administracoes.length ? ` — ${entry.administracoes.length} medicaç${entry.administracoes.length > 1 ? 'ões' : 'ão'}` : ''}`);
+  refreshSelected();
+}
+
+// ===== EVOLUÇÃO MÉDICA =====
+function diagnosticoInicial(a) {
+  const c = a.consulta;
+  return c.diagnostico ? `${c.cid ? c.cid + ' — ' : ''}${c.diagnostico}` : '';
+}
+
+function renderMedHist(a) {
+  const lista = intDe(a).evolucoesMed || [];
+  const perm = (intDe(a).permanencias || []).map(p => ({ ...p, permanencia: true }));
+  const todos = [...lista.map((e, i) => ({ ...e, n: i + 1 })).filter(e => !e.anulada), ...perm].sort((x, y) => y.em.localeCompare(x.em));
+  document.getElementById('medHist').innerHTML = (todos.length ? todos.map((e, idx) => e.permanencia
+    ? `<details class="hist"><summary><span class="stage-pill pending">Permanência</span><span class="hist-when">${esc(fmtDataHora(e.em))}</span>
+         <span class="hist-who">${esc(e.medico)}</span></summary>
+         <div class="hist-body"><p>${esc(e.motivo)} — ${esc(motivoLabel(e.motivo))}</p>${e.cid ? `<p>CID ${esc(SUS.fmtCid(e.cid))} — ${esc(e.cidDescricao || '')}</p>` : ''}${e.procCodigo ? `<p>Procedimento ${esc(SUS.fmtProc(e.procCodigo))} — ${esc(e.procDescricao || '')}</p>` : ''}</div></details>`
+    : `<details class="hist" ${idx === 0 ? 'open' : ''}>
+      <summary><span class="hist-num">#${e.n}</span><span class="hist-when">${esc(fmtDataHora(e.em))}</span><span class="hist-who">${esc(e.medico)}</span>
+        ${e.retificacoes?.length ? '<span class="stage-pill pending">Retificada</span>' : ''}
+        ${acoesEvolucao('med', e.n - 1, e)}</summary>
+      <div class="hist-body">
+        ${vitalPills(e.ssvv)}
+        ${e.diagnostico ? `<span class="lbl">Hipótese diagnóstica</span><p>${esc(e.diagnostico)}</p>` : ''}
+        ${e.plano ? `<span class="lbl">Plano de cuidado</span><p>${esc(e.plano)}</p>` : ''}
+        ${e.estadoPaciente ? `<span class="lbl">Estado do paciente</span><p>${esc(e.estadoPaciente)}</p>` : ''}
+        ${e.anotacoes ? `<span class="lbl">Anotações</span><p>${esc(e.anotacoes)}</p>` : ''}
+        ${e.prescricao?.length ? `<span class="lbl">Prescrição</span><p>${esc(e.prescricao.map(p => `${p.med}${p.pos ? ' (' + p.pos + ')' : ''}`).join('; '))}</p>` : ''}
+        ${e.exames?.length ? `<span class="lbl">Exames solicitados</span><p>${esc(e.exames.map(x => x.exame).join(', '))}</p>` : ''}
+        ${retificacoesHtml(lista[e.n - 1], 'med')}
+      </div>
+    </details>`).join('') : '<p class="hist-empty">Nenhum acompanhamento registrado.</p>') + anuladasHtml(lista);
+}
+
+// ao trocar de paciente ou salvar: formulário fechado e finalização limpa
+function resetMedForm(a) {
+  fecharNovaEvolucaoMed();
+  document.getElementById('medDiagInicial').textContent = diagnosticoInicial(a) || '—';
+  preencherProfissionais(document.getElementById('sai_medico'), { niveis: ['medico'] });
+  document.getElementById('sai_motivo').value = '';
+  ['sai_medico', 'sai_motivo', 'sai_cid_busca', 'sai_proc_busca'].forEach(clearErr);
+  limparSaidaCid();
+  atualizarObrigatoriosSaida();
+}
+
+function fecharNovaEvolucaoMed() {
+  document.getElementById('medNovaForm').style.display = 'none';
+  document.getElementById('btnNovaMed').disabled = false;
+  editEvol.med = null;
+}
+
+// "k" edita a evolução médica existente
+function abrirNovaEvolucaoMed(k = null) {
+  const a = findAtend(selectedId);
+  const e = k != null ? intDe(a).evolucoesMed[k] : null;
+  editEvol.med = k;
+  modoFormEvolucao('med', k);
+  const now = new Date();
+  document.getElementById('med_data').value = e ? e.em.slice(0, 10) : isoDate(now);
+  document.getElementById('med_hora').value = e ? e.em.slice(11, 16) : isoTime(now);
+  preencherProfissionais(document.getElementById('med_medico'), { niveis: ['medico'], ...(e ? { id: e.medicoId ?? null, texto: e.medico || '' } : {}) });
+  const sv = e?.ssvv || {};
+  [['med_diagnostico', e?.diagnostico], ['med_plano', e?.plano], ['med_pa', sv.pa], ['med_temp', sv.temp], ['med_fc', sv.fc], ['med_fr', sv.fr],
+    ['med_spo2', sv.spo2], ['med_peso', sv.peso], ['med_estado', e?.estadoPaciente], ['med_anotacoes', e?.anotacoes]]
+    .forEach(([id, v]) => document.getElementById(id).value = v || '');
+  fillTable('medPrescBody', e?.prescricao || []);
+  fillTable('medExamesBody', e?.exames || []);
+  // na edição, abre as seções que têm conteúdo
+  document.querySelectorAll('#medNovaForm details.acc').forEach(d => {
+    d.open = !!e && [...d.querySelectorAll('input')].some(i => i.value.trim());
+  });
+  clearErr('med_medico');
+  document.getElementById('medNovaForm').style.display = 'block';
+  document.getElementById('btnNovaMed').disabled = true;
+  document.getElementById('medNovaForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function saveEvolucaoMed() {
+  const a = findAtend(selectedId);
+  const k = editEvol.med;
+  const orig = k != null ? intDe(a).evolucoesMed[k] : null;
+  const val = id => document.getElementById(id).value.trim();
+  const medico = lerProfissional(document.getElementById('med_medico'));
+  if (!medico.texto) { showErr('med_medico'); showToast('⚠️ Escolha o médico'); return; }
+  if (orig && !val('med_motivo')) { showErr('med_motivo'); showToast('⚠️ Informe o motivo da retificação'); return; }
+  const prescricao = readTable('medPrescBody');
+  const exames = readTable('medExamesBody');
+  if (![val('med_diagnostico'), val('med_plano'), val('med_estado'), val('med_anotacoes')].some(Boolean) && !prescricao.length && !exames.length) {
+    showToast('⚠️ Preencha ao menos um campo do acompanhamento');
+    return;
+  }
+  const entry = {
+    em: `${val('med_data') || isoDate(new Date())}T${val('med_hora') || isoTime(new Date())}`,
+    medico: medico.texto,
+    medicoId: medico.id,
+    salvoEm: agora(),
+    por: autorAtual(),
+    diagnostico: val('med_diagnostico'),
+    plano: val('med_plano'),
+    ssvv: { pa: val('med_pa'), temp: val('med_temp'), fc: val('med_fc'), fr: val('med_fr'), spo2: val('med_spo2'), peso: val('med_peso') },
+    estadoPaciente: val('med_estado'),
+    anotacoes: val('med_anotacoes'),
+    prescricao, exames,
+  };
+  const int = intDe(a);
+  if (orig) {
+    if (!diferencasEvolucao(orig, entry, 'med').length) { showToast('Nenhuma alteração na evolução'); fecharNovaEvolucaoMed(); return; }
+    const lista = [...int.evolucoesMed];
+    lista[k] = retificar(orig, entry, 'med', val('med_motivo'));
+    Store.upsert({ id: a.id, internacao: { ...int, evolucoesMed: lista } });
+    atendimentos = Store.all();
+    showToast(`✏️ Evolução médica #${k + 1} retificada`);
+    refreshSelected();
+    return;
+  }
+  Store.upsert({ id: a.id, internacao: { ...int, evolucoesMed: [...(int.evolucoesMed || []), entry] } });
+  atendimentos = Store.all();
+  showToast('✅ Evolução médica registrada');
+  refreshSelected();
+}
+
+function buildMotivos() {
+  document.getElementById('sai_motivo').innerHTML = '<option value="">Selecione...</option>' + MOTIVOS_SAIDA.map(g =>
+    `<optgroup label="${g.grupo}">${g.itens.map(([c, l]) => `<option value="${c}">${c} - ${l}</option>`).join('')}</optgroup>`).join('');
+}
+
+// ===== FINALIZAÇÃO: CID E PROCEDIMENTO SUS =====
+let saidaCid  = '';   // código do CID escolhido (ex.: J189)
+let saidaProc = '';   // código do procedimento escolhido (ex.: 0303140151)
+
+// sexo e idade (em meses, como nas tabelas SUS) do paciente selecionado
+function pacienteSus() {
+  const a = findAtend(selectedId);
+  if (!a) return {};
+  let idadeMeses = null;
+  if (a.ident.nasc) {
+    const [y, m, d] = a.ident.nasc.split('-').map(Number);
+    const hoje = new Date();
+    idadeMeses = (hoje.getFullYear() - y) * 12 + (hoje.getMonth() + 1 - m) - (hoje.getDate() < d ? 1 : 0);
+  }
+  return { sexo: a.ident.sexo || '', idadeMeses };
+}
+
+// as tabelas SUS (~1 MB) só são carregadas quando a finalização é aberta
+function carregarSus() {
+  const status = document.getElementById('susStatus');
+  const campos = ['sai_cid_busca'].map(id => document.getElementById(id));
+  if (SUS.carregado) { status.textContent = ''; return Promise.resolve(); }
+  status.textContent = 'Carregando tabelas SUS (CID-10 e procedimentos)...';
+  campos.forEach(c => c.disabled = true);
+  return SUS.carregar()
+    .then(() => { status.textContent = ''; campos.forEach(c => c.disabled = false); })
+    .catch(err => { status.textContent = `⚠️ ${err.message}`; });
+}
+
+function chipSus(cod, descricao, aoRemover) {
+  return `<span class="sus-cod">${esc(cod)}</span><span class="sus-desc">${esc(descricao)}</span>
+          <button type="button" class="modal-close" onclick="${aoRemover}()" title="Trocar" aria-label="Trocar"><span class="material-symbols-outlined">close</span></button>`;
+}
+
+function setSaidaCid(cod) {
+  const cid = SUS.cid(cod);
+  saidaCid = cod;
+  clearErr('sai_cid_busca');
+  const campo = document.getElementById('sai_cid_busca');
+  campo.style.display = 'none';
+  const chip = document.getElementById('saiCidSel');
+  chip.innerHTML = chipSus(SUS.fmtCid(cod), cid?.descricao || '', 'limparSaidaCid');
+  chip.style.display = 'flex';
+
+  // procedimento já escolhido continua só se for compatível com o novo CID
+  const compat = SUS.procedimentosCompativeis(cod, pacienteSus());
+  if (saidaProc && !compat.some(p => p.cod === saidaProc)) limparSaidaProc();
+  const proc = document.getElementById('sai_proc_busca');
+  proc.disabled = !compat.length;
+  proc.placeholder = compat.length ? 'Código ou descrição do procedimento' : 'Nenhum procedimento compatível';
+  document.getElementById('saiProcHint').textContent = compat.length
+    ? `${compat.length} procedimento${compat.length > 1 ? 's' : ''} compatíve${compat.length > 1 ? 'is' : 'l'} com ${SUS.fmtCid(cod)} para este paciente.`
+    : `Nenhum procedimento da tabela é compatível com ${SUS.fmtCid(cod)} para o sexo/idade deste paciente. Escolha outro CID.`;
+  if (compat.length && !saidaProc) setTimeout(() => proc.focus(), 0);
+}
+
+function limparSaidaCid() {
+  saidaCid = '';
+  const campo = document.getElementById('sai_cid_busca');
+  campo.value = '';
+  campo.style.display = '';
+  document.getElementById('saiCidSel').style.display = 'none';
+  limparSaidaProc();
+  const proc = document.getElementById('sai_proc_busca');
+  proc.disabled = true;
+  proc.placeholder = 'Escolha primeiro o CID';
+  document.getElementById('saiProcHint').textContent = '';
+}
+
+function setSaidaProc(cod) {
+  const p = SUS.procedimento(cod);
+  saidaProc = cod;
+  clearErr('sai_proc_busca');
+  document.getElementById('sai_proc_busca').style.display = 'none';
+  const chip = document.getElementById('saiProcSel');
+  chip.innerHTML = chipSus(SUS.fmtProc(cod), p?.descricao || '', 'limparSaidaProc');
+  chip.style.display = 'flex';
+}
+
+function limparSaidaProc() {
+  saidaProc = '';
+  const campo = document.getElementById('sai_proc_busca');
+  campo.value = '';
+  campo.style.display = '';
+  document.getElementById('saiProcSel').style.display = 'none';
+}
+
+// CID e procedimento são obrigatórios para encerrar; na permanência são opcionais
+function atualizarObrigatoriosSaida() {
+  const motivo = document.getElementById('sai_motivo').value;
+  const obrigatorio = !motivo || !isPermanencia(motivo);
+  document.querySelectorAll('#saidaCard .req-sus').forEach(r => r.style.display = obrigatorio ? '' : 'none');
+}
+
+function setupSaidaSus() {
+  autocompletar(document.getElementById('sai_cid_busca'), {
+    buscar: termo => (SUS.carregado ? SUS.buscarCids(termo, pacienteSus()) : []),
+    desenharItem: c => `
+      <span class="sus-cod">${SUS.fmtCid(c.cod)}</span>
+      <div class="ac-info">
+        <strong>${esc(c.descricao)}</strong>
+        <span>${c.nProcedimentos ? `${c.nProcedimentos} procedimento${c.nProcedimentos > 1 ? 's' : ''} compatíve${c.nProcedimentos > 1 ? 'is' : 'l'}` : 'Nenhum procedimento compatível'}</span>
+      </div>`,
+    escolher: c => setSaidaCid(c.cod),
+  });
+  autocompletar(document.getElementById('sai_proc_busca'), {
+    buscar: termo => (saidaCid ? SUS.buscarProcedimentos(saidaCid, termo, pacienteSus()) : []),
+    desenharItem: p => `
+      <span class="sus-cod">${SUS.fmtProc(p.cod)}</span>
+      <div class="ac-info"><strong>${esc(p.descricao)}</strong></div>`,
+    escolher: p => setSaidaProc(p.cod),
+    abrirAoFocar: true,
+  });
+  document.getElementById('saidaCard').addEventListener('toggle', e => { if (e.target.open) carregarSus(); });
+  document.querySelectorAll('#saidaCard label[for="sai_cid_busca"] .req, #saidaCard label[for="sai_proc_busca"] .req')
+    .forEach(r => r.classList.add('req-sus'));
+}
+
+function registrarSaida() {
+  const a = findAtend(selectedId);
+  const val = id => document.getElementById(id).value.trim();
+  const motivo = val('sai_motivo');
+  const encerra = motivo && !isPermanencia(motivo);
+  let ok = true;
+  const medico = lerProfissional(document.getElementById('sai_medico'));
+  if (!medico.texto) { showErr('sai_medico'); ok = false; }
+  if (!motivo) { showErr('sai_motivo'); ok = false; }
+  // para encerrar a internação (alta, óbito, transferência...) o CID e o procedimento SUS são obrigatórios
+  if (encerra && !saidaCid) { showErr('sai_cid_busca'); ok = false; }
+  if (encerra && !saidaProc) { showErr('sai_proc_busca'); ok = false; }
+  if (!ok) {
+    showToast(encerra && (!saidaCid || !saidaProc) ? '⚠️ Informe o CID e o procedimento SUS para dar alta' : '⚠️ Preencha os campos obrigatórios');
+    return;
+  }
+
+  const registro = {
+    em: agora(), medico: medico.texto, medicoId: medico.id, por: autorAtual(), motivo,
+    cid: saidaCid, cidDescricao: saidaCid ? SUS.cid(saidaCid)?.descricao || '' : '',
+    procCodigo: saidaProc, procDescricao: saidaProc ? SUS.procedimento(saidaProc)?.descricao || '' : '',
+  };
+  const int = intDe(a);
+
+  if (isPermanencia(registro.motivo)) {
+    Store.upsert({ id: a.id, internacao: { ...int, permanencias: [...(int.permanencias || []), registro] } });
+    atendimentos = Store.all();
+    showToast('📌 Permanência registrada');
+    refreshSelected();
+    return;
+  }
+
+  Store.upsert({ id: a.id, internacao: { ...int, saida: registro } });
+  atendimentos = Store.all();
+  showToast(`✅ ${a.nome}: ${motivoLabel(registro.motivo)} — leito liberado`);
+  const proximo = internados()[0];
+  proximo ? selectAtend(proximo.id) : clearSelection();
+}
+
+// ===== RESUMO DO PACIENTE =====
+function valor(v, sufixo = '') {
+  return v ? `<span class="ps-value">${esc(v)}${sufixo}</span>` : '<span class="ps-value vazio">—</span>';
+}
+
+function bloco(label, texto) {
+  return `<div class="ps-block"><span class="ps-label">${label}</span><p class="${texto ? '' : 'vazio'}">${esc(texto || '—')}</p></div>`;
+}
+
+// sinais vitais mais recentes: evoluções > admissão > triagem
+function ultimosSinais(a) {
+  const int = intDe(a);
+  const evol = [...evolucoesValidas(int.evolucoesEnf), ...evolucoesValidas(int.evolucoesMed)]
+    .filter(e => e.ssvv && (e.ssvv.pa || e.ssvv.temp || e.ssvv.fc || e.ssvv.spo2))
+    .sort((x, y) => y.em.localeCompare(x.em))[0];
+  if (evol) return { ...evol.ssvv, fonte: `${evol.profissional !== undefined ? 'Evolução de enfermagem' : 'Evolução médica'} · ${fmtDataHora(evol.em)}` };
+  const c = int.admissao?.campos || {};
+  if (int.admissao?.salvaEm && (c.ssvv_pa || c.ssvv_temp || c.ssvv_fc || c.ssvv_spo2)) {
+    return { pa: c.ssvv_pa, temp: c.ssvv_temp, fc: c.ssvv_fc, spo2: c.ssvv_spo2, fonte: `Admissão · ${fmtDataHora(admissaoEm(a))}` };
+  }
+  const t = a.triagem;
+  return { pa: t.pa, temp: t.temp, fc: t.fc, spo2: t.spo2, fonte: t.risco ? `Triagem · ${fmtData(a.data)} às ${a.hora}` : 'Sem sinais vitais registrados' };
+}
+
+function renderSummary(a) {
+  const i = a.ident, t = a.triagem, c = a.consulta;
+  const idade = calcAge(i.nasc);
+  const docs = [i.cpf && `CPF ${i.cpf}`, i.cns && `CNS ${i.cns}`].filter(Boolean).join(' · ');
+  const sv = ultimosSinais(a);
+  const leito = intDe(a).admissao?.salvaEm ? intDe(a).admissao.leito : '';
+
+  let alergias = '<span class="ps-value vazio">—</span>';
+  if (t.risco) {
+    alergias = t.alergias?.length
+      ? `<span class="ps-value alergia">⚠️ ${esc(t.alergias.join(', '))}</span>`
+      : '<span class="ps-value sem-alergia">✓ Nenhuma</span>';
+  }
+
+  document.getElementById('patientSummary').innerHTML = `
+    <div class="ps-name-row">
+      <div>
+        <div class="pat-avatar ps-avatar" style="background:${a.color}">${esc(iniciais(a.nome))}</div>
+        <div class="ps-name">${esc(a.nome)}</div>
+        <p class="ps-sub">${esc(docs || 'Sem documento informado')}${idade !== null ? ` · ${idade} anos` : ''}</p>
+      </div>
+      ${leito
+        ? `<span class="leito-chip" title="Admitido em ${esc(fmtDataHora(admissaoEm(a)))}"><span class="material-symbols-outlined">bed</span>${esc(leitoLabel(leito))} · desde ${esc(fmtDataHora(admissaoEm(a)))}</span>`
+        : `<span class="leito-chip pendente"><span class="material-symbols-outlined">schedule</span>Aguardando admissão</span>`}
+    </div>
+
+    <div class="section-label"><span class="material-symbols-outlined">person</span> Informações do Paciente</div>
+    <div class="ps-grid">
+      <div class="ps-item"><span class="ps-label">Sexo</span>${valor(SEXOS[i.sexo])}</div>
+      <div class="ps-item"><span class="ps-label">Idade</span>${valor(idade !== null ? idade : '', idade !== null ? ' anos' : '')}</div>
+      <div class="ps-item"><span class="ps-label">Raça</span>${valor(RACAS[i.raca])}</div>
+      <div class="ps-item"><span class="ps-label">Alergias</span>${alergias}</div>
+    </div>
+    <div class="ps-grid ps-vitals">
+      <div class="ps-item"><span class="ps-label">Pressão arterial</span>${valor(sv.pa)}</div>
+      <div class="ps-item"><span class="ps-label">Temperatura</span>${valor(sv.temp, ' °C')}</div>
+      <div class="ps-item"><span class="ps-label">Freq. cardíaca</span>${valor(sv.fc, ' bpm')}</div>
+      <div class="ps-item"><span class="ps-label">Saturação O²</span>${valor(sv.spo2, '%')}</div>
+    </div>
+    <p class="ps-caption">Sinais vitais: ${esc(sv.fonte)}</p>
+    <div class="ps-blocks">
+      ${bloco('Queixa principal', t.queixa)}
+      ${bloco('Diagnóstico inicial', diagnosticoInicial(a))}
+      ${bloco('Plano de cuidado', c.plano)}
+      ${bloco('Médico responsável', c.medico)}
+    </div>
+  `;
+}
+
+// ===== LISTA =====
+function renderList() {
+  const list = document.getElementById('intList');
+  const qDigits = searchQuery.replace(/\D/g, '');
+  const todos = internados();
+  const data = todos.filter(a => !searchQuery ||
+    a.nome.toLowerCase().includes(searchQuery) ||
+    (qDigits && [a.ident.cpf, a.ident.cns, a.ident.telefone].some(v => (v || '').replace(/\D/g, '').includes(qDigits))));
+
+  document.getElementById('countBadge').textContent = todos.length;
+  document.getElementById('emptyState').style.display = data.length ? 'none' : 'block';
+
+  list.innerHTML = data.map(a => {
+    const int = intDe(a);
+    const nEvol = evolucoesValidas(int.evolucoesEnf).length + evolucoesValidas(int.evolucoesMed).length;
+    const sub = [
+      admitido(a) ? leitoLabel(int.admissao.leito) : 'Aguardando admissão',
+      a.triagem.alergias?.length ? `<span class="pat-alergia">⚠️ ${esc(a.triagem.alergias.join(', '))}</span>` : '',
+    ].filter(Boolean);
+    const alerta = pendenciaAlerta(a);
+    const alertaBtn = alerta
+      ? `<button type="button" class="med-alert ${alerta.atrasada ? 'late' : ''}" onclick="event.stopPropagation(); abrirAlerta(${a.id}, '${alerta.horario}')"
+           title="${alerta.qtd} medicaç${alerta.qtd > 1 ? 'ões' : 'ão'} das ${alerta.horario} ${alerta.atrasada ? 'atrasada' + (alerta.qtd > 1 ? 's' : '') : 'para administrar'} — registrar evolução">💊 ${alerta.horario}</button>`
+      : '';
+    return `<div class="patient-item compact ${selectedId === a.id ? 'selected' : ''}" onclick="selectAtend(${a.id})">
+      <div class="pat-avatar" style="background:${a.color}">${esc(iniciais(a.nome))}</div>
+      <div class="pat-info">
+        <div class="pat-name-row"><h6>${esc(a.nome)}</h6>${alertaBtn}</div>
+        <p>${sub.map((s, i) => i === 0 ? esc(s) : s).join(' · ')}</p>
+      </div>
+      <span class="count-badge" title="${nEvol} evoluç${nEvol === 1 ? 'ão' : 'ões'}">${nEvol}</span>
+    </div>`;
+  }).join('');
+}
+
+function filterInt(q) {
+  searchQuery = q.trim().toLowerCase();
+  renderList();
+}
+
+// ===== ABAS =====
+function switchTab(tabId) {
+  document.querySelectorAll('#intTabs .modal-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  document.querySelectorAll('.int-tabs-card .modal-tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${tabId}`));
+}
+
+document.getElementById('intTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.modal-tab-btn');
+  if (btn && !btn.disabled) switchTab(btn.dataset.tab);
+});
+
+// as evoluções só liberam depois da admissão salva
+function applyLocks(a) {
+  const liberado = admitido(a);
+  document.querySelectorAll('#intTabs .modal-tab-btn').forEach(b => {
+    if (b.dataset.tab === 'admissao') return;
+    b.disabled = !liberado;
+    b.title = liberado ? '' : 'Salve a admissão para liberar';
+  });
+  const ativa = document.querySelector('#intTabs .modal-tab-btn.active');
+  if (!ativa || ativa.disabled) switchTab('admissao');
+}
+
+// ===== SELEÇÃO =====
+// alerta da lista -> paciente -> Evolução Enfermagem -> Novo, já no horário da medicação
+function abrirAlerta(id, horario) {
+  selectAtend(id);
+  switchTab('enfermagem');
+  abrirNovaEvolucao(horario);
+}
+
+function selectAtend(id) {
+  atendimentos = Store.all();
+  const a = findAtend(id);
+  if (!a || !isInternado(a)) { clearSelection(); return; }
+  selectedId = id;
+  renderSummary(a);
+  fillAdmissao(a);
+  renderEnfHist(a);
+  resetEnfForm(a);
+  renderMedHist(a);
+  resetMedForm(a);
+  applyLocks(a);
+  document.getElementById('intEmpty').style.display = 'none';
+  document.getElementById('intContent').style.display = 'flex';
+  renderList();
+}
+
+// depois de salvar: atualiza resumo, históricos e travas mantendo a aba atual
+function refreshSelected() {
+  const aba = document.querySelector('#intTabs .modal-tab-btn.active')?.dataset.tab;
+  selectAtend(selectedId);
+  if (aba && !document.querySelector(`#intTabs [data-tab="${aba}"]`).disabled) switchTab(aba);
+}
+
+function clearSelection() {
+  selectedId = null;
+  document.getElementById('intEmpty').style.display = 'block';
+  document.getElementById('intContent').style.display = 'none';
+  renderList();
+}
+
+function showErr(id) {
+  document.getElementById(id).classList.add('error');
+  document.getElementById('err-' + id)?.classList.add('show');
+}
+
+function clearErr(id) {
+  document.getElementById(id)?.classList.remove('error');
+  document.getElementById('err-' + id)?.classList.remove('show');
+}
+
+// ===== INIT =====
+iniciarPagina('internacoes');
+
+buildRegioes();
+buildMotivos();
+setupSaidaSus();
+renderList();
+const primeiro = internados()[0];
+if (primeiro) selectAtend(primeiro.id);
+
+// outra página alterou os atendimentos: atualiza a lista sem apagar o que está sendo digitado
+// os alertas dependem da hora: revisa a lista a cada minuto
+setInterval(() => {
+  atendimentos = Store.all();
+  renderList();
+  const a = findAtend(selectedId);
+  if (a && isInternado(a)) renderEnfHint(a);
+}, 60000);
+
+Store.onChange(() => {
+  atendimentos = Store.all();
+  const a = findAtend(selectedId);
+  if (selectedId && (!a || !isInternado(a))) clearSelection();
+  else renderList();
+});
+</script>
+</body>
+</html>

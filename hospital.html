@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Hospital — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">Dados da unidade, alas e leitos</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR: montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav"></ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+
+          <!-- STATS -->
+          <div class="stats-strip">
+            <div class="stat-card">
+              <div class="stat-icon blue"><span class="material-symbols-outlined">domain</span></div>
+              <div class="stat-info"><p>Alas</p><h4 id="sAlas">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><span class="material-symbols-outlined">bed</span></div>
+              <div class="stat-info"><p>Leitos</p><h4 id="sLeitos">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red"><span class="material-symbols-outlined">personal_injury</span></div>
+              <div class="stat-info"><p>Ocupados</p><h4 id="sOcupados">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon yellow"><span class="material-symbols-outlined">event_available</span></div>
+              <div class="stat-info"><p>Livres</p><h4 id="sLivres">0</h4></div>
+            </div>
+          </div>
+
+          <div class="cad-stack">
+            <!-- Dados do hospital -->
+            <div class="cad-card">
+              <div class="cad-card-head">
+                <h5><span class="material-symbols-outlined">local_hospital</span> Dados do hospital</h5>
+              </div>
+              <div class="cad-card-body">
+                <div class="field-row">
+                  <div class="field-group">
+                    <label class="field-label" for="hNome">Nome <span class="req">*</span></label>
+                    <input type="text" class="field-input" id="hNome" oninput="clearErr('hNome')">
+                    <div class="field-error" id="err-hNome">Informe o nome do hospital</div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="hCnes">CNES <span class="req">*</span></label>
+                    <input type="text" inputmode="numeric" class="field-input" id="hCnes" maxlength="7" placeholder="0000000" oninput="this.value = this.value.replace(/\D/g, ''); clearErr('hCnes')">
+                    <div class="field-error" id="err-hCnes">O CNES tem 7 dígitos</div>
+                  </div>
+                </div>
+                <div class="field-row-3">
+                  <div class="field-group">
+                    <label class="field-label" for="hCep">CEP <span class="req">*</span></label>
+                    <div id="cepWrap">
+                      <input type="text" inputmode="numeric" class="field-input" id="hCep" maxlength="9" placeholder="00000-000" oninput="maskCEP(this); clearErr('hCep'); onCep()">
+                    </div>
+                    <div class="field-hint" id="cepHint">Cidade e estado são preenchidos pelo CEP.</div>
+                    <div class="field-error" id="err-hCep">CEP inválido</div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="hCidade">Cidade</label>
+                    <input type="text" class="field-input" id="hCidade">
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="hUf">Estado (UF)</label>
+                    <input type="text" class="field-input" id="hUf" maxlength="2" oninput="this.value = this.value.toUpperCase()">
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field-group">
+                    <label class="field-label" for="hLogradouro">Endereço <span class="req">*</span></label>
+                    <input type="text" class="field-input" id="hLogradouro" placeholder="Rua, avenida..." oninput="clearErr('hLogradouro')">
+                    <div class="field-error" id="err-hLogradouro">Informe o endereço</div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="hNumero">Número</label>
+                    <input type="text" class="field-input" id="hNumero">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Responsáveis que constam no laudo de AIH -->
+            <div class="cad-card">
+              <div class="cad-card-head">
+                <h5><span class="material-symbols-outlined">assignment</span> Laudo de AIH e AIH</h5>
+              </div>
+              <div class="cad-card-body">
+                <p class="field-hint" style="margin:0 0 12px">Dados impressos no laudo para solicitação de AIH (diretor clínico no campo 46; autorizador nos campos 58 a 62) e na AIH (órgão emissor e autorizador).</p>
+                <div class="field-row-3">
+                  <div class="field-group">
+                    <label class="field-label" for="dirNome">Diretor clínico</label>
+                    <input type="text" class="field-input" id="dirNome">
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="dirDocTipo">Documento</label>
+                    <select class="field-select" id="dirDocTipo" onchange="mascaraDoc('dir')">
+                      <option value="cns">CNS</option>
+                      <option value="cpf">CPF</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="dirDoc">Nº do documento</label>
+                    <input type="text" inputmode="numeric" class="field-input" id="dirDoc" oninput="mascaraDoc('dir'); clearErr('dirDoc')">
+                    <div class="field-error" id="err-dirDoc">Documento inválido</div>
+                  </div>
+                </div>
+                <div class="field-row-3">
+                  <div class="field-group">
+                    <label class="field-label" for="autNome">Profissional autorizador</label>
+                    <input type="text" class="field-input" id="autNome">
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="autCpf">CPF do autorizador</label>
+                    <input type="text" inputmode="numeric" class="field-input" id="autCpf" maxlength="14" placeholder="000.000.000-00" oninput="maskCPF(this); clearErr('autCpf')">
+                    <div class="field-error" id="err-autCpf">CPF inválido</div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="autCns">CNS do autorizador</label>
+                    <input type="text" inputmode="numeric" class="field-input" id="autCns" maxlength="18" placeholder="000 0000 0000 0000" oninput="maskCNS(this); clearErr('autCns')">
+                    <div class="field-error" id="err-autCns">O CNS tem 15 dígitos</div>
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field-group">
+                    <label class="field-label" for="autOrgao">Código do órgão autorizador / emissor</label>
+                    <input type="text" class="field-input" id="autOrgao" maxlength="20" placeholder="Ex: M150175801">
+                  </div>
+                  <div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alas e leitos -->
+            <div class="cad-card">
+              <div class="cad-card-head">
+                <h5><span class="material-symbols-outlined">bed</span> Alas e leitos</h5>
+                <button type="button" class="btn-soft" style="height:36px" onclick="addAla()">
+                  <span class="material-symbols-outlined" style="font-size:1rem;vertical-align:-3px">add</span> Nova ala
+                </button>
+              </div>
+              <div class="cad-card-body">
+                <div class="ala-head"><span>Ala</span><span>Recebe</span><span>Leitos</span><span>Ocupação</span><span></span></div>
+                <div id="alasLista"></div>
+                <p class="field-hint" style="margin:10px 0 14px">
+                  Os leitos de cada ala são numerados de 1 até a quantidade informada. Uma ala com pacientes internados não pode ser removida,
+                  e a quantidade de leitos não pode ficar abaixo do maior leito ocupado.
+                </p>
+              </div>
+              <div class="form-footer" style="margin-top:0">
+                <button type="button" class="btn-cancel" onclick="carregar()">Descartar</button>
+                <button type="button" class="btn-save" onclick="salvar()">
+                  <span class="material-symbols-outlined">check_circle</span> Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+
+<script>
+let alas = []; // cópia em edição; "id" vazio = ala nova
+
+// leitos ocupados de uma ala (números), pelos pacientes internados e já admitidos
+function leitosOcupadosDaAla(id) {
+  return Store.all()
+    .filter(a => isInternado(a) && a.internacao?.admissao?.salvaEm && a.internacao.admissao.leito?.startsWith(`${id}-`))
+    .map(a => Number(a.internacao.admissao.leito.split('-').pop()));
+}
+
+function carregar() {
+  const h = Hospital.get();
+  document.getElementById('hNome').value = h.nome || '';
+  document.getElementById('hCnes').value = h.cnes || '';
+  document.getElementById('hCep').value = h.cep || '';
+  document.getElementById('hCidade').value = h.cidade || '';
+  document.getElementById('hUf').value = h.uf || '';
+  document.getElementById('hLogradouro').value = h.logradouro || '';
+  document.getElementById('hNumero').value = h.numero || '';
+  const aih = h.aih || {};
+  ['dir'].forEach(p => {
+    document.getElementById(p + 'Nome').value = aih[p + 'Nome'] || '';
+    document.getElementById(p + 'DocTipo').value = aih[p + 'DocTipo'] || 'cns';
+    document.getElementById(p + 'Doc').value = aih[p + 'Doc'] || '';
+  });
+  document.getElementById('autOrgao').value = aih.orgaoAutorizador || '';
+  document.getElementById('autNome').value = aih.autNome || '';
+  // cadastros antigos tinham um documento só para o autorizador
+  document.getElementById('autCpf').value = aih.autCpf || (aih.autDocTipo === 'cpf' ? aih.autDoc : '') || '';
+  document.getElementById('autCns').value = aih.autCns || (aih.autDocTipo === 'cns' ? aih.autDoc : '') || '';
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.field-input.error').forEach(e => e.classList.remove('error'));
+  alas = (h.alas || []).map(a => ({ ...a }));
+  renderAlas();
+}
+
+function renderAlas() {
+  document.getElementById('alasLista').innerHTML = alas.length ? alas.map((a, i) => {
+    const ocupados = a.id ? leitosOcupadosDaAla(a.id) : [];
+    const total = Number(a.leitos) || 0;
+    const pct = total ? Math.min(100, Math.round((ocupados.length / total) * 100)) : 0;
+    return `<div class="ala-row">
+      <input type="text" class="field-input a-nome" value="${esc(a.nome)}" placeholder="Nome da ala" aria-label="Nome da ala" oninput="alas[${i}].nome = this.value">
+      <select class="field-select a-pub" aria-label="Público da ala" onchange="alas[${i}].publico = this.value">
+        ${Object.entries(PUBLICOS_ALA).map(([k, l]) => `<option value="${k}" ${k === a.publico ? 'selected' : ''}>${l}</option>`).join('')}
+      </select>
+      <input type="number" class="field-input a-leitos" min="1" value="${esc(a.leitos)}" aria-label="Quantidade de leitos" oninput="alas[${i}].leitos = this.value; renderStats()">
+      <div class="ocupacao a-ocup ${total && ocupados.length >= total ? 'cheia' : ''}">
+        ${ocupados.length} de ${total} ocupado${ocupados.length === 1 ? '' : 's'}
+        <div class="barra"><span style="width:${pct}%"></span></div>
+      </div>
+      <button type="button" class="btn-table-delete a-del" onclick="removerAla(${i})" title="${ocupados.length ? 'Ala com pacientes internados' : 'Remover ala'}" ${ocupados.length ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''}>
+        <span class="material-symbols-outlined">delete</span>
+      </button>
+    </div>`;
+  }).join('') : '<p class="field-hint" style="margin:6px 0">Nenhuma ala cadastrada.</p>';
+  renderStats();
+}
+
+function renderStats() {
+  const leitos = alas.reduce((s, a) => s + (Number(a.leitos) || 0), 0);
+  const ocupados = alas.reduce((s, a) => s + (a.id ? leitosOcupadosDaAla(a.id).length : 0), 0);
+  document.getElementById('sAlas').textContent = alas.length;
+  document.getElementById('sLeitos').textContent = leitos;
+  document.getElementById('sOcupados').textContent = ocupados;
+  document.getElementById('sLivres').textContent = Math.max(0, leitos - ocupados);
+}
+
+function addAla() {
+  alas.push({ id: '', nome: '', publico: 'misto', leitos: 1 });
+  renderAlas();
+  document.querySelector('#alasLista .ala-row:last-child input')?.focus();
+}
+
+function removerAla(i) {
+  if (alas[i].id && leitosOcupadosDaAla(alas[i].id).length) return;
+  alas.splice(i, 1);
+  renderAlas();
+}
+
+// ===== DOCUMENTOS DO LAUDO DE AIH =====
+function mascaraDoc(pref) {
+  const el = document.getElementById(pref + 'Doc');
+  document.getElementById(pref + 'DocTipo').value === 'cpf' ? maskCPF(el) : maskCNS(el);
+}
+const docValido = (tipo, v) => !v || (tipo === 'cpf' ? cpfValido(v) : v.replace(/\D/g, '').length === 15);
+
+// ===== CEP (ViaCEP) =====
+let cepConsultado = '';
+async function onCep() {
+  const cep = document.getElementById('hCep').value.replace(/\D/g, '');
+  const hint = document.getElementById('cepHint');
+  if (cep.length !== 8 || cep === cepConsultado) return;
+  cepConsultado = cep;
+  const wrap = document.getElementById('cepWrap');
+  wrap.classList.add('input-loading');
+  hint.textContent = 'Consultando CEP...';
+  try {
+    const resp = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const d = await resp.json();
+    if (d.erro) throw new Error('nao-encontrado');
+    document.getElementById('hCidade').value = d.localidade || '';
+    document.getElementById('hUf').value = d.uf || '';
+    // endereço só é sugerido se ainda estiver vazio
+    const end = document.getElementById('hLogradouro');
+    if (!end.value.trim() && d.logradouro) { end.value = d.logradouro; clearErr('hLogradouro'); }
+    hint.textContent = `CEP encontrado: ${d.localidade}/${d.uf}.`;
+  } catch (err) {
+    cepConsultado = '';
+    hint.textContent = err.message === 'nao-encontrado'
+      ? 'CEP não encontrado. Confira o número ou preencha cidade e estado.'
+      : 'Não foi possível consultar o CEP agora (sem internet?). Preencha cidade e estado.';
+  } finally {
+    wrap.classList.remove('input-loading');
+  }
+}
+
+// ===== SALVAR =====
+function salvar() {
+  const val = id => document.getElementById(id).value.trim();
+  let ok = true;
+  if (!val('hNome')) { showErr('hNome'); ok = false; }
+  if (!/^\d{7}$/.test(val('hCnes'))) { showErr('hCnes'); ok = false; }
+  if (val('hCep').replace(/\D/g, '').length !== 8) { showErr('hCep'); ok = false; }
+  if (!val('hLogradouro')) { showErr('hLogradouro'); ok = false; }
+  if (!docValido(val('dirDocTipo'), val('dirDoc'))) { showErr('dirDoc'); ok = false; }
+  if (!docValido('cpf', val('autCpf'))) { showErr('autCpf'); ok = false; }
+  if (!docValido('cns', val('autCns'))) { showErr('autCns'); ok = false; }
+  if (!ok) { showToast('⚠️ Confira os dados do hospital'); return; }
+
+  // alas: nome obrigatório e único, leitos >= 1 e >= maior leito ocupado
+  const nomes = new Set();
+  for (const a of alas) {
+    const nome = (a.nome || '').trim();
+    const leitos = parseInt(a.leitos, 10);
+    if (!nome) { showToast('⚠️ Toda ala precisa de um nome'); return; }
+    if (nomes.has(nome.toLowerCase())) { showToast(`⚠️ Há duas alas chamadas "${nome}"`); return; }
+    nomes.add(nome.toLowerCase());
+    if (!leitos || leitos < 1) { showToast(`⚠️ A ala ${nome} precisa de pelo menos 1 leito`); return; }
+    const maior = a.id ? Math.max(0, ...leitosOcupadosDaAla(a.id)) : 0;
+    if (leitos < maior) { showToast(`⚠️ A ala ${nome} tem o leito ${maior} ocupado; não dá para reduzir para ${leitos} leito${leitos > 1 ? 's' : ''}`); return; }
+  }
+  if (!alas.length) { showToast('⚠️ Cadastre pelo menos uma ala'); return; }
+
+  // ala removida não pode ter internados (garantia extra, o botão já fica bloqueado)
+  const removidas = (Hospital.get().alas || []).filter(o => !alas.some(a => a.id === o.id));
+  const comPaciente = removidas.find(o => leitosOcupadosDaAla(o.id).length);
+  if (comPaciente) { showToast(`⚠️ A ala ${comPaciente.nome} tem pacientes internados`); return; }
+
+  // id das alas novas: derivado do nome, sem repetir (os leitos guardam "id-numero")
+  const usados = new Set(alas.filter(a => a.id).map(a => a.id));
+  const alasFinal = alas.map(a => {
+    if (a.id) return { id: a.id, nome: a.nome.trim(), publico: a.publico, leitos: parseInt(a.leitos, 10) };
+    let id = slugTexto(a.nome) || 'ala', n = 2;
+    while (usados.has(id)) id = `${slugTexto(a.nome)}-${n++}`;
+    usados.add(id);
+    return { id, nome: a.nome.trim(), publico: a.publico, leitos: parseInt(a.leitos, 10) };
+  });
+
+  Hospital.set({
+    ...Hospital.get(),
+    nome: val('hNome'), cnes: val('hCnes'), cep: val('hCep'), cidade: val('hCidade'), uf: val('hUf'),
+    logradouro: val('hLogradouro'), numero: val('hNumero'), alas: alasFinal,
+    aih: {
+      dirNome: val('dirNome'), dirDocTipo: val('dirDocTipo'), dirDoc: val('dirDoc'),
+      autNome: val('autNome'), autCpf: val('autCpf'), autCns: val('autCns'), orgaoAutorizador: val('autOrgao'),
+    },
+  });
+  showToast('✅ Dados do hospital salvos');
+  carregar();
+}
+
+function showErr(id) {
+  document.getElementById(id).classList.add('error');
+  document.getElementById('err-' + id)?.classList.add('show');
+}
+function clearErr(id) {
+  document.getElementById(id)?.classList.remove('error');
+  document.getElementById('err-' + id)?.classList.remove('show');
+}
+
+// ===== INIT =====
+if (iniciarPagina('hospital')) carregar();
+Hospital.onChange(carregar);
+</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Faixas de AIH — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">Numeração das AIHs autorizada pelo gestor</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR: montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav"></ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+
+          <!-- STATS -->
+          <div class="stats-strip">
+            <div class="stat-card">
+              <div class="stat-icon blue"><span class="material-symbols-outlined">confirmation_number</span></div>
+              <div class="stat-info"><p>Faixas</p><h4 id="sFaixas">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><span class="material-symbols-outlined">event_available</span></div>
+              <div class="stat-info"><p>Disponíveis na vigente</p><h4 id="sDisponiveis">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon yellow"><span class="material-symbols-outlined">done_all</span></div>
+              <div class="stat-info"><p>Usados na vigente</p><h4 id="sUsados">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red"><span class="material-symbols-outlined">arrow_forward</span></div>
+              <div class="stat-info"><p>Próximo número</p><h4 id="sProximo" class="faixa-num" style="font-size:1rem">—</h4></div>
+            </div>
+          </div>
+
+          <div class="main-split">
+
+            <!-- LISTA -->
+            <div>
+              <div class="list-card">
+                <div class="list-card-header">
+                  <h5>Faixas de AIH</h5>
+                  <button class="btn-new" onclick="novo()">
+                    <span class="material-symbols-outlined">add</span> Nova faixa
+                  </button>
+                </div>
+                <p class="field-hint" id="liberados" style="margin:0;padding:10px 22px 0"></p>
+                <div id="lista"></div>
+                <div class="list-empty" id="vazio" style="display:none">
+                  <span class="material-symbols-outlined">confirmation_number</span>
+                  <p>Nenhuma faixa cadastrada.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- FORMULÁRIO -->
+            <div>
+              <div class="form-card" id="formCard">
+                <div class="form-header">
+                  <div>
+                    <h5 id="fTitulo">Nova faixa</h5>
+                    <p id="fSubtitulo">Numeração autorizada pelo gestor</p>
+                  </div>
+                  <button type="button" class="btn-close-form" onclick="novo()" title="Nova faixa">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem">close</span>
+                  </button>
+                </div>
+                <div class="form-body">
+                  <div class="form-section">
+                    <div class="section-label"><span class="material-symbols-outlined">event</span> Vigência</div>
+                    <div class="field-row">
+                      <div class="field-group">
+                        <label class="field-label" for="aVigIni">De <span class="req">*</span></label>
+                        <input type="date" class="field-input" id="aVigIni" onchange="clearErr('aVigIni')">
+                        <div class="field-error" id="err-aVigIni">Informe o início da vigência</div>
+                      </div>
+                      <div class="field-group">
+                        <label class="field-label" for="aVigFim">Até <span class="req">*</span></label>
+                        <input type="date" class="field-input" id="aVigFim" onchange="clearErr('aVigFim')">
+                        <div class="field-error" id="err-aVigFim">O fim deve ser depois do início</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-section">
+                    <div class="section-label"><span class="material-symbols-outlined">pin</span> Numeração</div>
+                    <div class="field-group">
+                      <label class="field-label" for="aMunicipio">Município</label>
+                      <input type="text" class="field-input" id="aMunicipio" placeholder="Ex: 150175 Brejo Grande do Araguaia">
+                    </div>
+                    <div class="field-row">
+                      <div class="field-group">
+                        <label class="field-label" for="aInicio">AIH inicial <span class="req">*</span></label>
+                        <input type="text" inputmode="numeric" class="field-input faixa-num" id="aInicio" maxlength="12" placeholder="12 dígitos" oninput="soNumeros(this); clearErr('aInicio')">
+                        <div class="field-error" id="err-aInicio">A faixa tem 12 dígitos</div>
+                      </div>
+                      <div class="field-group">
+                        <label class="field-label" for="aFinal">AIH final <span class="req">*</span></label>
+                        <input type="text" inputmode="numeric" class="field-input faixa-num" id="aFinal" maxlength="12" placeholder="12 dígitos" oninput="soNumeros(this); clearErr('aFinal')">
+                        <div class="field-error" id="err-aFinal">A faixa tem 12 dígitos</div>
+                      </div>
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="aUltimo">Último utilizado</label>
+                      <input type="text" inputmode="numeric" class="field-input faixa-num" id="aUltimo" maxlength="12" placeholder="Em branco = nenhum número usado" oninput="soNumeros(this); clearErr('aUltimo')">
+                      <div class="field-error" id="err-aUltimo">Deve estar entre o número inicial e o final</div>
+                      <div class="field-hint">Atualizado automaticamente a cada AIH gerada. Informe a faixa com 12 dígitos, como enviada pelo gestor: o sistema acrescenta o dígito verificador (ex.: 152410112418 → AIH 1524101124183).</div>
+                    </div>
+                    <div class="field-hint" id="resumoFaixa" style="margin-bottom:12px"></div>
+                  </div>
+                  <div class="form-footer">
+                    <button type="button" class="btn-cancel" id="btnExcluir" style="display:none;color:#e04545" onclick="excluir()">Excluir</button>
+                    <button type="button" class="btn-cancel" onclick="novo()">Limpar</button>
+                    <button type="button" class="btn-save" onclick="salvar()">
+                      <span class="material-symbols-outlined">check_circle</span> Salvar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+
+<script>
+const STATUS_FAIXA = {
+  vigente:  { label: 'Vigente',  classe: 'ok' },
+  esgotada: { label: 'Esgotada', classe: 'erro' },
+  expirada: { label: 'Expirada', classe: 'neutro' },
+  futura:   { label: 'Futura',   classe: 'alerta' },
+};
+let editandoId = null;
+
+const fmtNum = n => Number(n).toLocaleString('pt-BR');
+const usados = f => (f.ultimo ? Number(f.ultimo) - Number(f.inicio) + 1 : 0);
+const LEN = 12;
+const total = f => Number(f.final) - Number(f.inicio) + 1;
+function soNumeros(el) { el.value = el.value.replace(/\D/g, ''); atualizarResumo(); }
+
+function renderLista() {
+  const faixas = FaixasAih.all().sort((a, b) => (b.vigenciaInicio || '').localeCompare(a.vigenciaInicio || ''));
+  const vigente = faixas.find(f => faixaStatus(f) === 'vigente');
+  document.getElementById('sFaixas').textContent = faixas.length;
+  document.getElementById('sDisponiveis').textContent = vigente ? fmtNum(faixaDisponiveis(vigente)) : '0';
+  document.getElementById('sUsados').textContent = vigente ? fmtNum(usados(vigente)) : '0';
+  // o próximo é um número cancelado, se houver; senão o seguinte da faixa vigente
+  const liberados = AihsLiberadas.get();
+  document.getElementById('sProximo').textContent = liberados.length ? liberados[0].numero
+    : vigente ? numeroAih(proximaBaseAih(vigente)) : '—';
+  document.getElementById('liberados').textContent = liberados.length
+    ? `${liberados.length} número${liberados.length > 1 ? 's' : ''} de AIH cancelado${liberados.length > 1 ? 's' : ''} aguardando reaproveitamento: ${liberados.map(l => l.numero).join(', ')}` : '';
+
+  document.getElementById('vazio').style.display = faixas.length ? 'none' : 'block';
+  document.getElementById('lista').innerHTML = faixas.map(f => {
+    const st = STATUS_FAIXA[faixaStatus(f)];
+    const pct = Math.min(100, Math.round((usados(f) / total(f)) * 100));
+    return `<div class="patient-item ${editandoId === f.id ? 'selected' : ''}" onclick="editar(${f.id})">
+      <div class="pat-avatar" style="background:var(--primary)"><span class="material-symbols-outlined" style="font-size:1.2rem">confirmation_number</span></div>
+      <div class="pat-info">
+        <h6>Vigência ${fmtData(f.vigenciaInicio)} a ${fmtData(f.vigenciaFim)}</h6>
+        ${f.municipio ? `<p>${esc(f.municipio)}</p>` : ''}
+        <p class="faixa-num">${esc(f.inicio)} → ${esc(f.final)} · qtde ${fmtNum(total(f))}</p>
+        <div class="faixa-barra" title="${pct}% utilizado"><span style="width:${pct}%"></span></div>
+        <p style="font-size:.69rem">${fmtNum(usados(f))} usados · ${fmtNum(faixaDisponiveis(f))} disponíveis${f.ultimo ? ` · última AIH <span class="faixa-num">${esc(numeroAih(f.ultimo))}</span>` : ''}</p>
+      </div>
+      <div class="pat-meta"><span class="selo ${st.classe}">${st.label}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function atualizarResumo() {
+  const ini = document.getElementById('aInicio').value, fim = document.getElementById('aFinal').value;
+  const el = document.getElementById('resumoFaixa');
+  el.textContent = ini.length === LEN && fim.length === LEN && Number(fim) >= Number(ini)
+    ? `Faixa com ${fmtNum(Number(fim) - Number(ini) + 1)} números: da AIH ${numeroAih(ini)} à ${numeroAih(fim)}.` : '';
+}
+
+function limparErros() {
+  document.querySelectorAll('#formCard .field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('#formCard .error').forEach(e => e.classList.remove('error'));
+}
+
+function novo() {
+  editandoId = null;
+  ['aVigIni', 'aVigFim', 'aMunicipio', 'aInicio', 'aFinal', 'aUltimo'].forEach(id => document.getElementById(id).value = '');
+  limparErros();
+  atualizarResumo();
+  document.getElementById('fTitulo').textContent = 'Nova faixa';
+  document.getElementById('fSubtitulo').textContent = 'Numeração autorizada pelo gestor';
+  document.getElementById('btnExcluir').style.display = 'none';
+  renderLista();
+}
+
+function editar(id) {
+  const f = FaixasAih.get(id);
+  if (!f) return;
+  novo();
+  editandoId = id;
+  document.getElementById('aVigIni').value = f.vigenciaInicio || '';
+  document.getElementById('aVigFim').value = f.vigenciaFim || '';
+  document.getElementById('aMunicipio').value = f.municipio || '';
+  document.getElementById('aInicio').value = f.inicio;
+  document.getElementById('aFinal').value = f.final;
+  document.getElementById('aUltimo').value = f.ultimo || '';
+  atualizarResumo();
+  document.getElementById('fTitulo').textContent = 'Editar faixa';
+  document.getElementById('fSubtitulo').textContent = `${f.inicio} → ${f.final}`;
+  // só dá para excluir faixa que nunca foi usada
+  document.getElementById('btnExcluir').style.display = usados(f) ? 'none' : '';
+  renderLista();
+  if (window.innerWidth <= 1100) document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function salvar() {
+  const val = id => document.getElementById(id).value.trim();
+  const [vigIni, vigFim, ini, fim, ult] = ['aVigIni', 'aVigFim', 'aInicio', 'aFinal', 'aUltimo'].map(val);
+  let ok = true;
+  limparErros();
+  if (!vigIni) { showErr('aVigIni'); ok = false; }
+  if (!vigFim || (vigIni && vigFim < vigIni)) { showErr('aVigFim'); ok = false; }
+  if (ini.length !== LEN) { showErr('aInicio'); ok = false; }
+  const errFim = document.getElementById('err-aFinal');
+  if (fim.length !== LEN) { errFim.textContent = 'A faixa tem 12 dígitos'; showErr('aFinal'); ok = false; }
+  else if (ini.length === LEN && Number(fim) < Number(ini)) { errFim.textContent = 'Deve ser maior ou igual ao número inicial'; showErr('aFinal'); ok = false; }
+  if (ult && (ult.length !== LEN || Number(ult) < Number(ini) || Number(ult) > Number(fim))) { showErr('aUltimo'); ok = false; }
+  if (!ok) { showToast('⚠️ Confira os campos destacados'); return; }
+
+  // as faixas não podem ter números em comum
+  const sobreposta = FaixasAih.all().find(f => f.id !== editandoId && Number(ini) <= Number(f.final) && Number(fim) >= Number(f.inicio));
+  if (sobreposta) { showToast(`⚠️ A numeração cruza com a faixa ${sobreposta.inicio} → ${sobreposta.final}`); return; }
+
+  const id = editandoId || FaixasAih.nextId();
+  FaixasAih.upsert({ id, municipio: val('aMunicipio'), vigenciaInicio: vigIni, vigenciaFim: vigFim, inicio: ini, final: fim, ultimo: ult });
+  showToast(editandoId ? '✅ Faixa atualizada' : '✅ Faixa cadastrada');
+  editar(id);
+}
+
+function excluir() {
+  const f = FaixasAih.get(editandoId);
+  if (!f || usados(f)) return;
+  if (!confirm(`Excluir a faixa ${f.inicio} → ${f.final}?`)) return;
+  FaixasAih.remove(f.id);
+  showToast('🗑️ Faixa excluída');
+  novo();
+}
+
+function showErr(id) {
+  document.getElementById(id).classList.add('error');
+  document.getElementById('err-' + id)?.classList.add('show');
+}
+function clearErr(id) {
+  document.getElementById(id)?.classList.remove('error');
+  document.getElementById('err-' + id)?.classList.remove('show');
+}
+
+// ===== INIT =====
+if (iniciarPagina('faixas-aih')) novo();
+FaixasAih.onChange(renderLista);
+AihsLiberadas.onChange(renderLista);
+</script>
+</body>
+</html>

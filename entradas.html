@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Entradas — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">Gerencie os atendimentos do hospital</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
+        <!-- montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+      </ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+
+          <!-- STATS -->
+          <div class="stats-strip">
+            <div class="stat-card">
+              <div class="stat-icon blue"><span class="material-symbols-outlined">group</span></div>
+              <div class="stat-info"><p>Total</p><h4 id="sTotal">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><span class="material-symbols-outlined">person_check</span></div>
+              <div class="stat-info"><p>Aguardando Identificação</p><h4 id="sSemIdent">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon yellow"><span class="material-symbols-outlined">stethoscope</span></div>
+              <div class="stat-info"><p>Aguardando Triagem</p><h4 id="sSemTriagem">0</h4></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red"><span class="material-symbols-outlined">medical_services</span></div>
+              <div class="stat-info"><p>Aguardando consulta</p><h4 id="sSemConsulta">0</h4></div>
+            </div>
+          </div>
+
+          <!-- SPLIT -->
+          <div class="main-split">
+
+            <!-- LIST -->
+            <div>
+              <div class="list-card">
+                <div class="list-card-header">
+                  <h5>Atendimentos</h5>
+                  <div class="search-wrap">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="searchInput" placeholder="Nome, CPF, CNS ou telefone..." oninput="filterAtends(this.value)">
+                  </div>
+                </div>
+
+                <div class="filter-chips">
+                  <button class="chip active" onclick="setFilter('all',this)">Todos</button>
+                  <button class="chip" onclick="setFilter('sem-ident',this)">Sem Identificação</button>
+                  <button class="chip" onclick="setFilter('sem-triagem',this)">Sem Triagem</button>
+                  <button class="chip" onclick="setFilter('sem-consulta',this)">Sem Consulta</button>
+                  <button class="btn-new" style="margin-left: auto;" onclick="openNew()">
+                    <span class="material-symbols-outlined">person_add</span>
+                    Novo
+                  </button>
+                </div>
+
+                <div id="atendList"></div>
+
+                <div class="list-empty" id="emptyState" style="display:none">
+                  <span class="material-symbols-outlined">person_off</span>
+                  <p>Nenhum atendimento encontrado.</p>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- FORM -->
+            <div>
+              <div class="form-card" id="formCard">
+
+                <div class="form-header">
+                  <div>
+                    <h5 id="fTitle">Novo atendimento</h5>
+                    <p id="fSubtitle">Preencha os dados do atendimento</p>
+                  </div>
+                  <button type="button" class="btn-close-form" onclick="openNew()" title="Fechar edição">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem">close</span>
+                  </button>
+                </div>
+
+                <!-- Avatar -->
+                <div class="avatar-builder">
+                  <div class="av-preview" id="avPreview" style="background:#3a7bd5">??</div>
+                  <div>
+                    <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">Cor do perfil</div>
+                    <div class="av-color-row" id="colorRow"></div>
+                  </div>
+                  <div class="av-info">
+                    <p>Iniciais</p>
+                    <div class="av-initials" id="avInitials">??</div>
+                  </div>
+                </div>
+
+                <div class="form-body">
+
+                  <!-- Dados da entrada -->
+                  <div class="form-section">
+                    <div class="section-label">
+                      <span class="material-symbols-outlined">badge</span> Informações do Atendimento
+                    </div>
+
+                    <div class="field-group ac-wrap">
+                      <label class="field-label" for="fNome">Nome Completo <span class="req">*</span></label>
+                      <input type="text" class="field-input" id="fNome" autocomplete="off" placeholder="Ex: José Maria Alves" oninput="onNome(this.value); clearErr('fNome')">
+                      <div class="field-error" id="err-fNome">Nome é obrigatório</div>
+                    </div>
+
+                    <div class="field-group">
+                      <label class="field-label" for="fRelato">Relato <span class="req">*</span></label>
+                      <textarea class="field-textarea" id="fRelato" placeholder="Motivo do atendimento..." oninput="clearErr('fRelato')"></textarea>
+                      <div class="field-error" id="err-fRelato">Relato é obrigatório</div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field-group">
+                        <label class="field-label" for="fData">Data <span class="req">*</span></label>
+                        <input type="date" class="field-input" id="fData" onchange="clearErr('fData')">
+                        <div class="field-error" id="err-fData">Data obrigatória</div>
+                      </div>
+                      <div class="field-group">
+                        <label class="field-label" for="fHora">Hora <span class="req">*</span></label>
+                        <input type="time" class="field-input" id="fHora" onchange="clearErr('fHora')">
+                        <div class="field-error" id="err-fHora">Hora obrigatória</div>
+                      </div>
+                    </div>
+
+                    <div class="field-group">
+                      <label class="field-label">Origem <span class="req">*</span></label>
+                      <div class="status-toggle">
+                        <div class="stgl-opt" data-value="novo" onclick="selectOrigem(this)">
+                          <span class="st-icon">🆕</span><span class="st-label">Novo</span>
+                        </div>
+                        <div class="stgl-opt" data-value="transferencia" onclick="selectOrigem(this)">
+                          <span class="st-icon">🚑</span><span class="st-label">Transferência</span>
+                        </div>
+                      </div>
+                      <div class="field-error" id="err-origem">Escolha a origem do atendimento</div>
+                      <div id="transfWrap" style="display:none">
+                        <div class="transf-opts">
+                          <button type="button" class="transf-opt" data-value="ambulatorio" onclick="setTransf(this.dataset.value)">
+                            <span class="material-symbols-outlined">stethoscope</span>Ambulatório
+                          </button>
+                          <button type="button" class="transf-opt" data-value="enfermaria" onclick="setTransf(this.dataset.value)">
+                            <span class="material-symbols-outlined">home_health</span>Enfermaria
+                          </button>
+                          <button type="button" class="transf-opt" data-value="exames" onclick="setTransf(this.dataset.value)">
+                            <span class="material-symbols-outlined">biotech</span>Exames
+                          </button>
+                          <button type="button" class="transf-opt" data-value="telemedicina" onclick="setTransf(this.dataset.value)">
+                            <span class="material-symbols-outlined">video_call</span>Telemedicina
+                          </button>
+                        </div>
+                        <div class="field-error" id="err-transf">Escolha o destino da transferência</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Abas -->
+                  <div class="modal-tabs" id="modalTabs">
+                    <button type="button" class="modal-tab-btn active" data-tab="identificacao">
+                      <span class="material-symbols-outlined">badge</span> Identificação
+                    </button>
+                    <button type="button" class="modal-tab-btn" data-tab="triagem">
+                      <span class="material-symbols-outlined">monitor_heart</span> Triagem <span class="material-symbols-outlined tab-lock">lock</span>
+                    </button>
+                    <button type="button" class="modal-tab-btn" data-tab="consulta">
+                      <span class="material-symbols-outlined">stethoscope</span> Consulta <span class="material-symbols-outlined tab-lock">lock</span>
+                    </button>
+                    <button type="button" class="modal-tab-btn" data-tab="exames" hidden>
+                      <span class="material-symbols-outlined">biotech</span> Exames <span class="material-symbols-outlined tab-lock">lock</span>
+                    </button>
+                    <button type="button" class="modal-tab-btn" data-tab="telemedicina" hidden>
+                      <span class="material-symbols-outlined">video_call</span> Telemedicina <span class="material-symbols-outlined tab-lock">lock</span>
+                    </button>
+                  </div>
+
+                  <!-- Aba: Identificação -->
+                  <div class="modal-tab-pane active" id="tab-identificacao">
+                    <div class="form-section">
+                      <p class="field-hint" style="margin:0 0 12px">Campos com <span style="color:var(--danger)">*</span> são necessários para concluir a identificação.</p>
+                      <div class="field-row">
+                        <div class="field-group ac-wrap">
+                          <label class="field-label" for="fCNS">CNS <span class="req">*</span></label>
+                          <input type="text" inputmode="numeric" class="field-input" id="fCNS" autocomplete="off" placeholder="000 0000 0000 0000" maxlength="18" oninput="maskCNS(this)">
+                        </div>
+                        <div class="field-group ac-wrap">
+                          <label class="field-label" for="fCPF">CPF</label>
+                          <input type="text" inputmode="numeric" class="field-input" id="fCPF" autocomplete="off" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)">
+                        </div>
+                      </div>
+
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fProntuario">Prontuário</label>
+                          <input type="text" class="field-input" id="fProntuario">
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fSexo">Sexo</label>
+                          <select class="field-select" id="fSexo">
+                            <option value="">Selecione...</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fRaca">Raça/Cor</label>
+                          <select class="field-select" id="fRaca">
+                            <option value="">Selecione...</option>
+                            <option value="01">Branca</option>
+                            <option value="02">Preta</option>
+                            <option value="03">Parda</option>
+                            <option value="04">Amarela</option>
+                            <option value="05">Indígena</option>
+                          </select>
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fNascimento">Nascimento</label>
+                          <input type="date" class="field-input" id="fNascimento" onchange="onNascChange(this.value)">
+                          <div class="field-hint" id="idadeHint"></div>
+                        </div>
+                      </div>
+
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fMae">Mãe <span class="req">*</span></label>
+                          <input type="text" class="field-input" id="fMae" placeholder="Ex: Nazaré Batista">
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fNaturalidade">Naturalidade</label>
+                          <input type="text" class="field-input" id="fNaturalidade" placeholder="Município/UF de nascimento">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">contact_phone</span> Informações de Contato
+                      </div>
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fTelefone">Telefone</label>
+                          <input type="text" inputmode="tel" class="field-input" id="fTelefone" placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)">
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fTipoLogradouro">Tipo Logradouro</label>
+                          <!-- Se precisar do código DNE do e-SUS/CADSUS, troque os values pelos códigos oficiais -->
+                          <select class="field-select" id="fTipoLogradouro">
+                            <option value="">Selecione...</option>
+                            <option value="rua">Rua</option>
+                            <option value="travessa">Travessa</option>
+                            <option value="avenida">Avenida</option>
+                            <option value="vila">Vila</option>
+                            <option value="fazenda">Fazenda</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="field-group">
+                        <label class="field-label" for="fLogradouro">Logradouro <span class="req">*</span></label>
+                        <input type="text" class="field-input" id="fLogradouro" placeholder="Ex: 13 de Maio">
+                      </div>
+
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fNumero">Número</label>
+                          <input type="text" class="field-input" id="fNumero">
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fBairro">Bairro</label>
+                          <input type="text" class="field-input" id="fBairro">
+                        </div>
+                      </div>
+
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fCep">CEP</label>
+                          <input type="text" inputmode="numeric" class="field-input" id="fCep" placeholder="00000-000" maxlength="9" oninput="maskCEP(this); buscarCepPaciente()">
+                          <div class="field-hint" id="cepHint">Município, UF e código IBGE vêm do CEP.</div>
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fMunicipio">Município</label>
+                          <input type="text" class="field-input" id="fMunicipio">
+                        </div>
+                      </div>
+
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="fUf">UF</label>
+                          <select class="field-select" id="fUf"></select>
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="fIbge">Código IBGE do município</label>
+                          <input type="text" inputmode="numeric" class="field-input" id="fIbge" maxlength="7" placeholder="0000000" oninput="this.value = this.value.replace(/\D/g, '')">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Aba: Triagem -->
+                  <div class="modal-tab-pane" id="tab-triagem">
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">emergency</span> Classificação de Risco
+                      </div>
+                      <div class="field-group">
+                        <div class="risk-toggle" id="riskToggle"></div>
+                        <div class="field-hint" id="riskHint">Sem classificação — atendimento aguardando triagem.</div>
+                      </div>
+                    </div>
+
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">ecg_heart</span> Sinais Vitais
+                      </div>
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="tPA">Pressão arterial (mmHg)</label>
+                          <input type="text" class="field-input" id="tPA" placeholder="120/80">
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="tTemp">Temperatura (°C)</label>
+                          <input type="number" class="field-input" id="tTemp" step="0.1">
+                        </div>
+                      </div>
+                      <div class="field-row">
+                        <div class="field-group">
+                          <label class="field-label" for="tFC">Freq. cardíaca (bpm)</label>
+                          <input type="number" class="field-input" id="tFC" min="0">
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="tSpO2">SpO₂ (%)</label>
+                          <input type="number" class="field-input" id="tSpO2" min="0" max="100">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">chat</span> Queixa Principal
+                      </div>
+                      <div class="field-group">
+                        <textarea class="field-textarea" id="tQueixa" aria-label="Queixa principal" placeholder="Queixa e observações da triagem..."></textarea>
+                      </div>
+                    </div>
+
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">warning</span> Alergias
+                      </div>
+                      <div class="field-group">
+                        <div class="allergy-input-wrap">
+                          <input type="text" class="field-input" id="allergyInput" placeholder="Digite e tecle Enter..." onkeydown="onAllergyKey(event)">
+                          <button type="button" class="btn-add-tag" onclick="addAllergy()" title="Adicionar alergia">
+                            <span class="material-symbols-outlined">add</span>
+                          </button>
+                        </div>
+                        <div class="allergy-tags" id="allergyTags"></div>
+                        <div class="allergy-suggestions" id="allergySuggestions"></div>
+                        <div class="field-hint">Sem alergias na lista, o resumo do paciente mostra "Nenhuma".</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Aba: Consulta -->
+                  <div class="modal-tab-pane" id="tab-consulta">
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">clinical_notes</span> Avaliação Médica
+                      </div>
+                      <div class="field-group">
+                        <label class="field-label" for="cMedico">Médico responsável <span class="req req-transf">*</span></label>
+                        <select class="field-select" id="cMedico"></select>
+                      </div>
+                      <div class="field-group">
+                        <label class="field-label" for="cDiagnostico">Diagnóstico <span class="req req-transf">*</span></label>
+                        <input type="text" class="field-input" id="cDiagnostico" placeholder="Descrição do diagnóstico">
+                      </div>
+                      <div class="field-group">
+                        <label class="field-label" for="cPlano">Plano de cuidado</label>
+                        <textarea class="field-textarea" id="cPlano" placeholder="Condutas, cuidados e orientações..."></textarea>
+                        <div class="field-hint" id="consultaTransfHint">A consulta é concluída quando médico responsável e diagnóstico são preenchidos.</div>
+                      </div>
+                      <!-- encaminhamento só para origem "Novo"; na transferência o destino já é o encaminhamento -->
+                      <div class="field-group" id="encGroup">
+                        <label class="field-label">Encaminhamento</label>
+                        <div class="transf-opts enc-opts" id="encOpts">
+                          <button type="button" class="transf-opt" data-value="ambulatorio" onclick="setEncaminhamento(this.dataset.value)">
+                            <span class="material-symbols-outlined">stethoscope</span>Ambulatório
+                          </button>
+                          <button type="button" class="transf-opt" data-value="enfermaria" onclick="setEncaminhamento(this.dataset.value)">
+                            <span class="material-symbols-outlined">home_health</span>Enfermaria
+                          </button>
+                          <button type="button" class="transf-opt" data-value="alta" onclick="setEncaminhamento(this.dataset.value)">
+                            <span class="material-symbols-outlined">directions_walk</span>Alta
+                          </button>
+                        </div>
+                        <div class="field-hint">A consulta é concluída quando o encaminhamento é definido.</div>
+                      </div>
+                    </div>
+
+                    <!-- só para origem "Novo" -->
+                    <div id="consultaCompleta">
+                      <div class="form-section">
+                        <div class="section-label">
+                          <span class="material-symbols-outlined">medication</span> Prescrição de Medicamentos
+                        </div>
+                        <div style="overflow-x:auto">
+                          <table class="cal-table">
+                            <thead>
+                              <tr>
+                                <th>Medicação</th>
+                                <th>Posologia</th>
+                                <th style="width:36px"></th>
+                              </tr>
+                            </thead>
+                            <tbody id="prescriptionTableBody"></tbody>
+                          </table>
+                        </div>
+                        <button type="button" class="btn-table-add" onclick="addRow('prescriptionTableBody')">
+                          <span class="material-symbols-outlined" style="font-size:.95rem">add</span> Adicionar medicação
+                        </button>
+                      </div>
+
+                      <div class="form-section">
+                        <div class="section-label">
+                          <span class="material-symbols-outlined">biotech</span> Solicitação de Exames
+                        </div>
+                        <div style="overflow-x:auto">
+                          <table class="cal-table">
+                            <thead>
+                              <tr>
+                                <th>Exame</th>
+                                <th>Observação</th>
+                                <th style="width:36px"></th>
+                              </tr>
+                            </thead>
+                            <tbody id="examesTableBody"></tbody>
+                          </table>
+                        </div>
+                        <button type="button" class="btn-table-add" onclick="addRow('examesTableBody')">
+                          <span class="material-symbols-outlined" style="font-size:.95rem">add</span> Adicionar exame
+                        </button>
+                      </div>
+
+                      <div class="form-section">
+                        <div class="section-label">
+                          <span class="material-symbols-outlined">prescriptions</span> Receita
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="cReceitaTipo">Tipo de receita</label>
+                          <select class="field-select" id="cReceitaTipo">
+                            <option value="simples">Receita simples</option>
+                            <option value="controle">Controle especial</option>
+                          </select>
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="cReceitaObs">Orientações ao paciente</label>
+                          <textarea class="field-textarea" id="cReceitaObs" placeholder="Ex: tomar após as refeições..."></textarea>
+                        </div>
+                        <button type="button" class="btn-doc" onclick="gerarReceita()">
+                          <span class="material-symbols-outlined">print</span> Gerar receita
+                        </button>
+                        <div class="field-hint">Usa os medicamentos da prescrição acima.</div>
+                      </div>
+
+                      <div class="form-section">
+                        <div class="section-label">
+                          <span class="material-symbols-outlined">description</span> Atestado
+                        </div>
+                        <div class="field-row">
+                          <div class="field-group">
+                            <label class="field-label" for="aDias">Dias de afastamento</label>
+                            <input type="number" class="field-input" id="aDias" min="1">
+                          </div>
+                          <div class="field-group">
+                            <label class="field-label" for="aInicio">A partir de</label>
+                            <input type="date" class="field-input" id="aInicio">
+                          </div>
+                        </div>
+                        <div class="field-group">
+                          <label class="field-label" for="aObs">Observações</label>
+                          <textarea class="field-textarea" id="aObs"></textarea>
+                        </div>
+                        <button type="button" class="btn-doc" onclick="gerarAtestado()">
+                          <span class="material-symbols-outlined">print</span> Gerar atestado
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Aba: Exames -->
+                  <div class="modal-tab-pane" id="tab-exames">
+                    <div class="form-section">
+                      <div class="section-label">
+                        <span class="material-symbols-outlined">biotech</span> Solicitação de Exames
+                      </div>
+                      <div style="overflow-x:auto">
+                        <table class="cal-table">
+                          <thead>
+                            <tr>
+                              <th>Exame</th>
+                              <th>Observação</th>
+                              <th style="width:36px"></th>
+                            </tr>
+                          </thead>
+                          <tbody id="labExamesTableBody"></tbody>
+                        </table>
+                      </div>
+                      <button type="button" class="btn-table-add" onclick="addRow('labExamesTableBody')">
+                        <span class="material-symbols-outlined" style="font-size:.95rem">add</span> Adicionar exame
+                      </button>
+                      <div class="field-error" id="err-labExames">Adicione ao menos um exame</div>
+                    </div>
+                    <div class="form-section">
+                      <button type="button" class="btn-action" id="btnLabSUS" onclick="enviarLabSUS()">
+                        <span class="material-symbols-outlined">send</span> Enviar para LabSUS
+                      </button>
+                      <div class="field-hint" id="labSUSStatus"></div>
+                    </div>
+                  </div>
+
+                  <!-- Aba: Telemedicina -->
+                  <div class="modal-tab-pane" id="tab-telemedicina">
+                    <div class="form-section">
+                      <button type="button" class="btn-action" id="btnTele" onclick="registrarTelemedicina()">
+                        <span class="material-symbols-outlined">video_call</span> Registrar Telemedicina
+                      </button>
+                      <div class="field-hint" id="teleStatus"></div>
+                    </div>
+                  </div>
+
+                  <div class="form-footer">
+                    <button type="button" class="btn-cancel" onclick="openNew()">Limpar</button>
+                    <button type="button" class="btn-save" onclick="saveAtend()">
+                      <span class="material-symbols-outlined">check_circle</span>
+                      Salvar
+                    </button>
+                  </div>
+
+                </div><!-- /form-body -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-icon"><span class="material-symbols-outlined">person_off</span></div>
+    <h5>Excluir atendimento?</h5>
+    <p id="deleteText">Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn-mc" onclick="closeDelete()">Cancelar</button>
+      <button class="btn-md" onclick="confirmDelete()">
+        <span class="material-symbols-outlined" style="font-size:.9rem">delete</span> Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+
+<script>
+// ===== CONSTANTS =====
+const AV_COLORS = ['#3a7bd5','#00c9a7','#a78bfa','#fb923c','#f472b6'];
+
+// campo do objeto -> id do input
+const IDENT_FIELDS = {
+  cns:'fCNS', cpf:'fCPF', prontuario:'fProntuario', sexo:'fSexo', raca:'fRaca', nasc:'fNascimento', mae:'fMae', naturalidade:'fNaturalidade',
+  telefone:'fTelefone', tipoLogradouro:'fTipoLogradouro', logradouro:'fLogradouro', numero:'fNumero',
+  bairro:'fBairro', cep:'fCep', municipio:'fMunicipio', uf:'fUf', ibge:'fIbge',
+};
+const TRIAGEM_FIELDS = {
+  pa:'tPA', temp:'tTemp', fc:'tFC', spo2:'tSpO2', queixa:'tQueixa',
+};
+const CONSULTA_FIELDS = {
+  diagnostico:'cDiagnostico', plano:'cPlano',
+};
+// campos extras da consulta, só para origem "Novo"
+const CONSULTA_NOVO_FIELDS = {
+  receitaTipo:'cReceitaTipo', receitaObs:'cReceitaObs', atestadoDias:'aDias', atestadoInicio:'aInicio', atestadoObs:'aObs',
+};
+
+// tabelas dinâmicas: colunas e placeholders
+const TABELAS = {
+  prescriptionTableBody: { campos:['med','pos'],   placeholders:['Ex: Dipirona 1g', 'Ex: EV 6/6h se dor'] },
+  examesTableBody:       { campos:['exame','obs'], placeholders:['Ex: Hemograma', 'Ex: em jejum'] },
+  labExamesTableBody:    { campos:['exame','obs'], placeholders:['Ex: Hemograma', 'Ex: em jejum'] },
+};
+
+// ===== STATE =====
+let atendimentos = Store.all();
+let editingId      = null;
+let deleteId       = null;
+let activeFilter   = 'all';
+let searchQuery    = '';
+let selectedColor  = '#3a7bd5';
+let selectedOrigem = '';
+let selectedRisco  = '';
+let selectedTransf = '';
+let selectedEncaminhamento = '';
+let examesEnviadoEm  = '';
+let teleRegistradoEm = '';
+let currentAllergies = [];
+
+// ===== ETAPAS =====
+const ativos = () => atendimentos.filter(a => !isConcluido(a));
+
+function destinoFinal(a) {
+  if (a.destinoTransf === 'exames')       return 'enviado para Exames (LabSUS)';
+  if (a.destinoTransf === 'telemedicina') return 'encaminhado para Telemedicina';
+  return a.consulta.encaminhamento === 'alta'
+    ? 'paciente de alta'
+    : `encaminhado para ${ENCAMINHAMENTOS[a.consulta.encaminhamento]}`;
+}
+
+// ===== COLOR PALETTE =====
+function buildColorPalette() {
+  const row = document.getElementById('colorRow');
+  AV_COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'av-color' + (c === selectedColor ? ' active' : '');
+    d.style.background = c;
+    d.title = c;
+    d.onclick = () => setColor(c);
+    row.appendChild(d);
+  });
+}
+
+function setColor(c) {
+  selectedColor = c;
+  document.getElementById('avPreview').style.background = c;
+  document.querySelectorAll('.av-color').forEach(x => x.classList.toggle('active', x.title === c));
+}
+
+// ===== ORIGEM =====
+function selectOrigem(el) {
+  document.getElementById('err-origem').classList.remove('show');
+  setOrigem(el.dataset.value);
+}
+
+function setOrigem(value) {
+  selectedOrigem = value;
+  document.querySelectorAll('.stgl-opt').forEach(o => {
+    o.className = 'stgl-opt';
+    if (o.dataset.value === value) o.classList.add('sel-' + value);
+  });
+  document.getElementById('transfWrap').style.display = value === 'transferencia' ? 'block' : 'none';
+  if (value !== 'transferencia') selectedTransf = '';
+  applyFlow();
+}
+
+function setTransf(value) {
+  selectedTransf = value;
+  document.getElementById('err-transf').classList.remove('show');
+  applyFlow();
+}
+
+// atendimento como está salvo (as abas são liberadas pelo que já foi salvo, não pelo que está digitado)
+function savedAtend() {
+  return editingId ? atendimentos.find(a => a.id === editingId) : null;
+}
+
+// cada aba só libera depois que todas as anteriores do fluxo foram salvas e concluídas
+// (novo: identificação -> triagem -> consulta; transferência: identificação -> aba do destino)
+function bloqueadaPor(stage, stages) {
+  const anteriores = stages.slice(0, stages.indexOf(stage));
+  const a = savedAtend();
+  return anteriores.find(s => !a || !stageDone(a, s)) || null;
+}
+const isUnlocked = (stage, stages) => !bloqueadaPor(stage, stages);
+
+// mostra só as abas do fluxo atual e bloqueia as que ainda não foram liberadas
+function applyFlow() {
+  const stages = stagesFor(selectedOrigem, selectedTransf);
+  document.querySelectorAll('#transfWrap .transf-opt').forEach(o => o.classList.toggle('selected', o.dataset.value === selectedTransf));
+  document.querySelectorAll('.modal-tab-btn').forEach(b => {
+    b.hidden = !stages.includes(b.dataset.tab);
+    const bloqueio = b.hidden ? null : bloqueadaPor(b.dataset.tab, stages);
+    b.disabled = !!bloqueio;
+    b.title = bloqueio ? `Salve a etapa "${STAGE_LABELS[bloqueio]}" para liberar` : '';
+  });
+  document.getElementById('consultaCompleta').style.display = selectedOrigem === 'novo' ? 'block' : 'none';
+  document.getElementById('tab-consulta').classList.toggle('flow-transf', selectedOrigem === 'transferencia');
+  const active = document.querySelector('.modal-tab-btn.active');
+  if (!active || active.hidden || active.disabled) switchTab('identificacao');
+}
+
+// ===== ENCAMINHAMENTO =====
+function setEncaminhamento(value) {
+  selectedEncaminhamento = selectedEncaminhamento === value ? '' : value;
+  document.querySelectorAll('#encOpts .transf-opt').forEach(o => o.classList.toggle('selected', o.dataset.value === selectedEncaminhamento));
+}
+
+// ===== EXAMES / TELEMEDICINA =====
+function updateActionButtons() {
+  const lab = document.getElementById('btnLabSUS');
+  lab.disabled = !!examesEnviadoEm;
+  lab.innerHTML = examesEnviadoEm
+    ? '<span class="material-symbols-outlined">check_circle</span> Enviado para LabSUS'
+    : '<span class="material-symbols-outlined">send</span> Enviar para LabSUS';
+  document.getElementById('labSUSStatus').textContent = examesEnviadoEm ? `Enviado em ${fmtDataHora(examesEnviadoEm)}` : '';
+
+  const tele = document.getElementById('btnTele');
+  tele.disabled = !!teleRegistradoEm;
+  tele.innerHTML = teleRegistradoEm
+    ? '<span class="material-symbols-outlined">check_circle</span> Telemedicina registrada'
+    : '<span class="material-symbols-outlined">video_call</span> Registrar Telemedicina';
+  document.getElementById('teleStatus').textContent = teleRegistradoEm ? `Registrada em ${fmtDataHora(teleRegistradoEm)}` : '';
+}
+
+// ===== CEP DO PACIENTE (ViaCEP) =====
+document.getElementById('fUf').innerHTML = '<option value="">Selecione...</option>' + UFS.map(uf => `<option>${uf}</option>`).join('');
+let cepPacienteConsultado = '';
+async function buscarCepPaciente() {
+  const cep = document.getElementById('fCep').value.replace(/\D/g, '');
+  const hint = document.getElementById('cepHint');
+  if (cep.length !== 8 || cep === cepPacienteConsultado) return;
+  cepPacienteConsultado = cep;
+  hint.textContent = 'Consultando CEP...';
+  try {
+    const d = await fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r => r.json());
+    if (d.erro) throw new Error('nao-encontrado');
+    document.getElementById('fMunicipio').value = d.localidade || '';
+    document.getElementById('fUf').value = d.uf || '';
+    document.getElementById('fIbge').value = d.ibge || '';
+    // logradouro e bairro só são sugeridos se ainda estiverem vazios
+    const sugerir = (id, v) => { const el = document.getElementById(id); if (!el.value.trim() && v) el.value = v; };
+    sugerir('fLogradouro', d.logradouro);
+    sugerir('fBairro', d.bairro);
+    hint.textContent = `CEP encontrado: ${d.localidade}/${d.uf} (IBGE ${d.ibge}).`;
+  } catch (err) {
+    cepPacienteConsultado = '';
+    hint.textContent = err.message === 'nao-encontrado'
+      ? 'CEP não encontrado. Confira o número ou preencha município, UF e IBGE.'
+      : 'Não foi possível consultar o CEP agora. Preencha município, UF e IBGE.';
+  }
+}
+
+// ===== LABSUS =====
+// dados enviados ao LabSUS: atendimento, paciente e exames solicitados
+function payloadLabSUS(a) {
+  const i = a.ident;
+  return {
+    atendimento: { id: a.id, data: a.data, hora: a.hora, relato: a.relato },
+    paciente: {
+      nome: a.nome, cns: i.cns, cpf: i.cpf, sexo: i.sexo, raca: i.raca, nascimento: i.nasc, mae: i.mae, telefone: i.telefone,
+      endereco: { tipoLogradouro: i.tipoLogradouro, logradouro: i.logradouro, numero: i.numero, bairro: i.bairro, cep: i.cep, municipio: i.municipio },
+    },
+    exames: a.exames.solicitacoes,
+    solicitadoEm: a.exames.enviadoEm,
+  };
+}
+
+function integrarLabSUS(payload) {
+  // TODO: trocar pela chamada real à API do LabSUS, por exemplo:
+  // fetch(LABSUS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+  console.info('[LabSUS] solicitação enviada', payload);
+  return true;
+}
+
+// o envio acontece no saveAtend; o botão só garante que há exames na lista
+function enviarLabSUS() {
+  if (!readTable('labExamesTableBody').length) {
+    document.getElementById('err-labExames').classList.add('show');
+    showToast('⚠️ Adicione ao menos um exame');
+    return;
+  }
+  document.getElementById('err-labExames').classList.remove('show');
+  saveAtend();
+}
+
+function registrarTelemedicina() {
+  // TODO: chamar a integração de telemedicina aqui; por enquanto só registra no atendimento
+  teleRegistradoEm = agora();
+  if (!saveAtend()) { teleRegistradoEm = ''; return; }
+  updateActionButtons();
+}
+
+// ===== RISCO =====
+function buildRiskOptions() {
+  const wrap = document.getElementById('riskToggle');
+  Object.entries(RISCOS).forEach(([key, r]) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'risk-opt';
+    btn.dataset.value = key;
+    btn.title = `Classificação: ${r.nome} (${r.label})`;
+    btn.style.setProperty('--rc', r.cor);
+    btn.innerHTML = `<span class="risk-dot"></span>${r.nome}<small>${r.label}</small>`;
+    btn.onclick = () => setRisco(selectedRisco === key ? '' : key);
+    wrap.appendChild(btn);
+  });
+}
+
+function setRisco(key) {
+  selectedRisco = key;
+  document.querySelectorAll('.risk-opt').forEach(o => o.classList.toggle('selected', o.dataset.value === key));
+  document.getElementById('riskHint').textContent = key
+    ? `Classificação: ${RISCOS[key].nome} (${RISCOS[key].label})`
+    : 'Sem classificação — atendimento aguardando triagem.';
+}
+
+// ===== ALERGIAS =====
+function buildAllergySuggestions() {
+  const wrap = document.getElementById('allergySuggestions');
+  wrap.innerHTML = '<span class="sugg-title">Comuns:</span>';
+  ALERGIAS_COMUNS.forEach(a => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sugg-chip';
+    btn.textContent = a;
+    btn.onclick = () => addAllergyValue(a);
+    wrap.appendChild(btn);
+  });
+}
+
+function onAllergyKey(e) {
+  if (e.key === 'Enter') { e.preventDefault(); addAllergy(); }
+}
+
+function addAllergy() {
+  addAllergyValue(document.getElementById('allergyInput').value.trim());
+}
+
+function addAllergyValue(val) {
+  if (!val || currentAllergies.some(a => a.toLowerCase() === val.toLowerCase())) return;
+  currentAllergies.push(val);
+  document.getElementById('allergyInput').value = '';
+  renderAllergyTags();
+}
+
+function removeAllergy(i) {
+  currentAllergies.splice(i, 1);
+  renderAllergyTags();
+}
+
+function renderAllergyTags() {
+  document.getElementById('allergyTags').innerHTML = currentAllergies.map((a, i) =>
+    `<span class="allergy-tag">⚠️ ${esc(a)}<button type="button" class="tag-remove" onclick="removeAllergy(${i})" title="Remover">✕</button></span>`
+  ).join('');
+}
+
+// ===== AUTOCOMPLETE DE PACIENTES =====
+// busca nos atendimentos anteriores; cada paciente aparece uma vez, com a identificação mais recente
+const semAcento = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const soDigitos = s => (s || '').replace(/\D/g, '');
+
+function pacientesConhecidos() {
+  const porChave = new Map();
+  Store.all()
+    .filter(a => a.id !== editingId && a.nome && (a.ident.cns || a.ident.cpf || a.ident.nasc))
+    .sort((x, y) => (y.data + y.hora).localeCompare(x.data + x.hora))
+    .forEach(a => {
+      const chave = soDigitos(a.ident.cns) || soDigitos(a.ident.cpf) || `${semAcento(a.nome)}|${a.ident.nasc}`;
+      if (porChave.has(chave)) return;
+      // alergias: as da triagem mais recente que chegou a ser feita
+      const triado = Store.all()
+        .filter(x => x.triagem.risco && (soDigitos(x.ident.cns) || soDigitos(x.ident.cpf) || `${semAcento(x.nome)}|${x.ident.nasc}`) === chave)
+        .sort((x, y) => (y.data + y.hora).localeCompare(x.data + x.hora))[0];
+      porChave.set(chave, { nome: a.nome, ident: a.ident, color: a.color, ultimo: a.data, alergias: triado?.triagem.alergias || [] });
+    });
+  return [...porChave.values()];
+}
+
+function buscarPacientes(tipo, termo) {
+  if (tipo === 'nome') {
+    const q = semAcento(termo).trim();
+    if (q.length < 2) return [];
+    return pacientesConhecidos().filter(p => semAcento(p.nome).includes(q)).slice(0, 6);
+  }
+  const q = soDigitos(termo);
+  if (q.length < 3) return [];
+  return pacientesConhecidos().filter(p => soDigitos(p.ident[tipo]).includes(q)).slice(0, 6);
+}
+
+function setupAutocomplete(inputId, tipo) {
+  autocompletar(document.getElementById(inputId), {
+    buscar: termo => buscarPacientes(tipo, termo),
+    desenharItem: p => `
+      <div class="pat-avatar" style="background:${p.color}">${esc(iniciais(p.nome))}</div>
+      <div class="ac-info">
+        <strong>${esc(p.nome)}</strong>
+        <span>${esc([p.ident.cns && `CNS ${p.ident.cns}`, p.ident.cpf && `CPF ${p.ident.cpf}`, p.ident.nasc && `Nasc. ${fmtData(p.ident.nasc)}`].filter(Boolean).join(' · '))}</span>
+      </div>`,
+    escolher: preencherPaciente,
+  });
+}
+
+// preenche nome, identificação e alergias com os dados do paciente escolhido
+function preencherPaciente(p) {
+  document.querySelectorAll('.ac-list.open').forEach(l => l.classList.remove('open'));
+  document.getElementById('fNome').value = p.nome;
+  onNome(p.nome);
+  clearErr('fNome');
+  fillFields(IDENT_FIELDS, p.ident);
+  onNascChange(p.ident.nasc);
+  if (p.alergias.length) {
+    p.alergias.forEach(al => { if (!currentAllergies.some(x => x.toLowerCase() === al.toLowerCase())) currentAllergies.push(al); });
+    renderAllergyTags();
+  }
+  setColor(p.color);
+  showToast(`✅ Dados de ${p.nome} preenchidos (último atendimento em ${fmtData(p.ultimo)})`);
+}
+
+// ===== TABS =====
+function switchTab(tabId) {
+  document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  document.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${tabId}`));
+}
+
+document.getElementById('modalTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.modal-tab-btn');
+  if (btn && !btn.disabled) switchTab(btn.dataset.tab);
+});
+
+// ===== RECEITA / ATESTADO =====
+function abrirDocumento(titulo, corpo) {
+  const medico = lerProfissional(document.getElementById('cMedico')).texto;
+  const logo = new URL('images/logo.png', location.href).href;
+  const w = window.open('', '_blank');
+  if (!w) { showToast('⚠️ Libere os pop-ups para gerar o documento'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="pt-br"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
+    <style>
+      body { font-family: Arial, sans-serif; color: #222; max-width: 720px; margin: 40px auto; padding: 0 24px; line-height: 1.6; }
+      header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #3a7bd5; padding-bottom: 12px; margin-bottom: 28px; }
+      header img { height: 42px; }
+      h1 { font-size: 20px; text-align: center; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 24px; }
+      ol { padding-left: 20px; } li { margin-bottom: 10px; }
+      .muted { color: #666; font-size: 13px; }
+      .assinatura { margin-top: 80px; text-align: center; }
+      .assinatura div { border-top: 1px solid #222; width: 320px; margin: 0 auto; padding-top: 6px; }
+    </style></head><body>
+    <header><img src="${logo}" alt=""><span class="muted">${fmtData(isoDate(new Date()))}</span></header>
+    <h1>${esc(titulo)}</h1>
+    ${corpo}
+    <div class="assinatura"><div>${esc(medico || 'Médico responsável')}</div></div>
+    <script>window.onload = () => window.print();<\/script>
+    </body></html>`);
+  w.document.close();
+}
+
+function gerarReceita() {
+  const meds = readTable('prescriptionTableBody');
+  if (!meds.length) { showToast('⚠️ Adicione ao menos um medicamento na prescrição'); return; }
+  const nome = document.getElementById('fNome').value.trim();
+  const tipo = document.getElementById('cReceitaTipo').value;
+  const obs  = document.getElementById('cReceitaObs').value.trim();
+  abrirDocumento(tipo === 'controle' ? 'Receita de Controle Especial' : 'Receita Médica', `
+    <p><strong>Paciente:</strong> ${esc(nome)}</p>
+    <ol>${meds.map(m => `<li><strong>${esc(m.med)}</strong><br>${esc(m.pos)}</li>`).join('')}</ol>
+    ${obs ? `<p><strong>Orientações:</strong> ${esc(obs)}</p>` : ''}`);
+}
+
+function gerarAtestado() {
+  const dias = parseInt(document.getElementById('aDias').value, 10);
+  if (!dias || dias < 1) { showToast('⚠️ Informe os dias de afastamento'); return; }
+  const nome   = document.getElementById('fNome').value.trim();
+  const data   = document.getElementById('fData').value;
+  const inicio = document.getElementById('aInicio').value || data;
+  const obs    = document.getElementById('aObs').value.trim();
+  abrirDocumento('Atestado Médico', `
+    <p>Atesto, para os devidos fins, que <strong>${esc(nome)}</strong> esteve sob atendimento médico nesta unidade
+      em ${fmtData(data)}, necessitando de <strong>${dias} dia${dias > 1 ? 's' : ''}</strong> de afastamento
+      de suas atividades a partir de ${fmtData(inicio)}.</p>
+    ${obs ? `<p>${esc(obs)}</p>` : ''}`);
+}
+
+// ===== FORM <-> OBJETO =====
+function readFields(map) {
+  const obj = {};
+  Object.entries(map).forEach(([k, id]) => { obj[k] = document.getElementById(id).value.trim(); });
+  return obj;
+}
+
+function fillFields(map, obj) {
+  Object.entries(map).forEach(([k, id]) => { document.getElementById(id).value = obj[k] || ''; });
+}
+
+// ===== AVATAR / NAME =====
+function onNome(nome) {
+  const up = iniciais(nome);
+  document.getElementById('avPreview').textContent  = up;
+  document.getElementById('avInitials').textContent = up;
+}
+
+// ===== AGE =====
+function onNascChange(val) {
+  const age = calcAge(val);
+  document.getElementById('idadeHint').textContent = age !== null && age >= 0 ? `${age} ano${age === 1 ? '' : 's'}` : '';
+}
+
+// ===== RENDER LIST =====
+function renderList() {
+  const list  = document.getElementById('atendList');
+  const empty = document.getElementById('emptyState');
+  const qDigits = searchQuery.replace(/\D/g, '');
+
+  const data = ativos().filter(a => {
+    let mf = true;
+    if      (activeFilter === 'sem-ident')    mf = isPending(a, 'identificacao');
+    else if (activeFilter === 'sem-triagem')  mf = aguardandoTriagem(a);
+    else if (activeFilter === 'sem-consulta') mf = aguardandoConsulta(a);
+
+    const ms = !searchQuery ||
+      a.nome.toLowerCase().includes(searchQuery) ||
+      (a.relato || '').toLowerCase().includes(searchQuery) ||
+      (qDigits && [a.ident.cpf, a.ident.cns, a.ident.telefone].some(v => (v || '').replace(/\D/g, '').includes(qDigits)));
+
+    return mf && ms;
+  }).sort((x, y) => (x.data + x.hora).localeCompare(y.data + y.hora));
+
+  updateStats();
+
+  if (!data.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = '';
+
+  data.forEach(a => {
+    const stages = stagesOf(a);
+    const risco = stages.includes('triagem') && RISCOS[a.triagem.risco];
+    const origemTxt = a.origem === 'transferencia'
+      ? `🚑 Transferência${a.destinoTransf ? ' · ' + TRANSF_LABELS[a.destinoTransf] : ''}`
+      : '🆕 Novo';
+    const riscoBadge = risco
+      ? `<div class="risk-badge" style="--rc:${risco.cor}" title="Classificação: ${risco.nome} (${risco.label})">${risco.nome}</div>`
+      : '';
+    const pill = (ok, txt) =>
+      `<span class="stage-pill ${ok ? 'done' : 'pending'}"><span class="material-symbols-outlined">${ok ? 'check' : 'schedule'}</span>${txt}</span>`;
+
+    const item = document.createElement('div');
+    item.className = 'patient-item' + (editingId === a.id ? ' selected' : '');
+    item.innerHTML = `
+      <div class="pat-avatar" style="background:${a.color}">${esc(iniciais(a.nome))}</div>
+      <div class="pat-info">
+        <h6>${esc(a.nome)}</h6>
+        <p>🕒 ${fmtData(a.data)} ${esc(a.hora)} &nbsp;·&nbsp; ${origemTxt}</p>
+        <p style="margin-top:1px;font-size:.69rem">${esc(a.relato || 'Sem relato')}</p>
+        <div class="stage-pills">
+          ${stages.map(s => pill(stageDone(a, s), STAGE_LABELS[s])).join('')}
+        </div>
+      </div>
+      <div class="pat-meta">
+        ${riscoBadge}
+        <div class="row-actions">
+          <button class="btn-sm" onclick="editAtend(${a.id},event)" title="Editar">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          <button class="btn-sm danger" onclick="openDelete(${a.id},event)" title="Excluir">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </div>
+    `;
+    item.addEventListener('click', () => editAtend(a.id));
+    list.appendChild(item);
+  });
+}
+
+// cards contam quem tem aquela etapa como próximo passo (fluxo "Novo": identificação -> triagem -> consulta)
+const aguardandoTriagem  = a => a.origem === 'novo' && isIdentificado(a) && !isTriado(a);
+const aguardandoConsulta = a => a.origem === 'novo' && isIdentificado(a) && isTriado(a) && !isConsultado(a);
+
+function updateStats() {
+  const lista = ativos();
+  document.getElementById('sTotal').textContent       = lista.length;
+  document.getElementById('sSemIdent').textContent    = lista.filter(a => isPending(a, 'identificacao')).length;
+  document.getElementById('sSemTriagem').textContent  = lista.filter(aguardandoTriagem).length;
+  document.getElementById('sSemConsulta').textContent = lista.filter(aguardandoConsulta).length;
+}
+
+// ===== FILTERS =====
+function setFilter(f, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = f;
+  renderList();
+}
+
+function filterAtends(q) {
+  searchQuery = q.trim().toLowerCase();
+  renderList();
+}
+
+// ===== FORM =====
+function openNew() {
+  editingId = null;
+  resetForm();
+  switchTab('identificacao');
+  renderList();
+  document.getElementById('fNome').focus({ preventScroll: true });
+}
+
+function editAtend(id, e) {
+  if (e) e.stopPropagation();
+  const a = atendimentos.find(x => x.id === id);
+  if (!a) return;
+  resetForm();
+  editingId = id;
+
+  document.getElementById('fTitle').textContent    = 'Editar atendimento';
+  document.getElementById('fSubtitle').textContent = a.nome;
+
+  setColor(a.color);
+  onNome(a.nome);
+
+  document.getElementById('fNome').value   = a.nome;
+  document.getElementById('fRelato').value = a.relato || '';
+  document.getElementById('fData').value   = a.data;
+  document.getElementById('fHora').value   = a.hora;
+  setOrigem(a.origem);
+  if (a.origem === 'transferencia') setTransf(a.destinoTransf || '');
+  examesEnviadoEm  = a.exames?.enviadoEm || '';
+  fillTable('labExamesTableBody', a.exames?.solicitacoes);
+  teleRegistradoEm = a.telemedicina?.registradoEm || '';
+  updateActionButtons();
+
+  fillFields(IDENT_FIELDS, a.ident);
+  onNascChange(a.ident.nasc);
+  fillFields(TRIAGEM_FIELDS, a.triagem);
+  setRisco(normalizaRisco(a.triagem.risco));
+  currentAllergies = [...(a.triagem.alergias || [])];
+  renderAllergyTags();
+  fillConsulta(a.consulta);
+
+  renderList();
+  if (window.innerWidth <= 1100) document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  document.querySelectorAll('#formCard .field-input, #formCard .field-select, #formCard .field-textarea').forEach(el => {
+    el.value = '';
+    el.classList.remove('error');
+  });
+  document.querySelectorAll('#formCard .field-error').forEach(e => e.classList.remove('show'));
+
+  const now = new Date();
+  document.getElementById('fData').value = isoDate(now);
+  document.getElementById('fHora').value = isoTime(now);
+  document.getElementById('idadeHint').textContent = '';
+  document.getElementById('cepHint').textContent = 'Município, UF e código IBGE vêm do CEP.';
+  cepPacienteConsultado = '';
+
+  setColor('#3a7bd5');
+  onNome('');
+  setOrigem('');
+  setRisco('');
+  currentAllergies = [];
+  renderAllergyTags();
+  fillConsulta({});
+  examesEnviadoEm  = '';
+  fillTable('labExamesTableBody', []);
+  teleRegistradoEm = '';
+  updateActionButtons();
+
+  document.getElementById('fTitle').textContent    = 'Novo atendimento';
+  document.getElementById('fSubtitle').textContent = 'Preencha os dados do atendimento';
+}
+
+// ===== CONSULTA <-> OBJETO =====
+function fillConsulta(c) {
+  // médico responsável: escolhido entre os médicos ativos do cadastro (padrão: quem está logado)
+  preencherProfissionais(document.getElementById('cMedico'), { niveis: ['medico'], id: c.medicoId ?? null, texto: c.medico || '' });
+  fillFields(CONSULTA_FIELDS, c);
+  fillFields(CONSULTA_NOVO_FIELDS, c);
+  if (!c.receitaTipo) document.getElementById('cReceitaTipo').value = 'simples';
+  selectedEncaminhamento = '';
+  if (c.encaminhamento) setEncaminhamento(c.encaminhamento);
+  else setEncaminhamento('');
+  fillTable('prescriptionTableBody', c.prescricao);
+  fillTable('examesTableBody', c.exames);
+}
+
+function readConsulta() {
+  const medico = lerProfissional(document.getElementById('cMedico'));
+  const basicos = { medico: medico.texto, medicoId: medico.id, ...readFields(CONSULTA_FIELDS) };
+  // transferência: só os campos básicos, e o encaminhamento é o próprio destino
+  const c = selectedOrigem === 'transferencia'
+    ? { ...basicos, encaminhamento: selectedTransf }
+    : { ...basicos, encaminhamento: selectedEncaminhamento, ...readFields(CONSULTA_NOVO_FIELDS),
+        prescricao: readTable('prescriptionTableBody'), exames: readTable('examesTableBody') };
+  // o médico pré-selecionado, o destino da transferência e o tipo de receita padrão sozinhos não são uma consulta registrada
+  const { medico: _m, medicoId: _id, receitaTipo: _r, encaminhamento, ...resto } = c;
+  const vazia = !Object.keys(chaveConteudo({ ...resto, encaminhamento: selectedOrigem === 'transferencia' ? '' : encaminhamento })).length;
+  return vazia ? {} : c;
+}
+
+// ===== SAVE =====
+// obrigatórios para salvar: nome, relato, data, hora e origem (e destino, se for transferência)
+function saveAtend() {
+  let valid = true;
+
+  const nome = document.getElementById('fNome').value.trim();
+  if (!nome) { showErr('fNome'); valid = false; }
+
+  const relato = document.getElementById('fRelato').value.trim();
+  if (!relato) { showErr('fRelato'); valid = false; }
+
+  const data = document.getElementById('fData').value;
+  if (!data) { showErr('fData'); valid = false; }
+
+  const hora = document.getElementById('fHora').value;
+  if (!hora) { showErr('fHora'); valid = false; }
+
+  if (!selectedOrigem) {
+    document.getElementById('err-origem').classList.add('show');
+    valid = false;
+  } else if (selectedOrigem === 'transferencia' && !selectedTransf) {
+    document.getElementById('err-transf').classList.add('show');
+    valid = false;
+  }
+
+  if (!valid) { showToast('⚠️ Preencha os campos obrigatórios'); return null; }
+
+  // guarda só os dados das etapas que fazem parte do fluxo escolhido
+  const stages = stagesFor(selectedOrigem, selectedTransf);
+  const liberadasAntes = stages.filter(s => isUnlocked(s, stages));
+  const atend = {
+    id:      editingId || Store.nextId(),
+    nome,
+    relato,
+    data,
+    hora,
+    origem:  selectedOrigem,
+    destinoTransf: selectedOrigem === 'transferencia' ? selectedTransf : '',
+    color:   selectedColor,
+    ident:   readFields(IDENT_FIELDS),
+    triagem: stages.includes('triagem')  ? { ...readFields(TRIAGEM_FIELDS), risco: selectedRisco, alergias: [...currentAllergies] } : {},
+    consulta:stages.includes('consulta') ? readConsulta() : {},
+    exames:       stages.includes('exames')       ? { solicitacoes: readTable('labExamesTableBody'), enviadoEm: examesEnviadoEm } : {},
+    telemedicina: stages.includes('telemedicina') ? { registradoEm: teleRegistradoEm } : {},
+  };
+
+  // autoria de cada bloco (quem registrou e cada alteração), comparando com o que estava salvo
+  const salvo = savedAtend();
+  const dadosEntrada = x => x && { nome: x.nome, relato: x.relato, data: x.data, hora: x.hora, origem: x.origem, destinoTransf: x.destinoTransf };
+  atend.reg = autoria(dadosEntrada(atend), dadosEntrada(salvo), salvo?.reg);
+  ['ident', 'triagem', 'consulta', 'exames', 'telemedicina'].forEach(k => {
+    const reg = autoria(atend[k], salvo?.[k], salvo?.[k]?.reg);
+    if (reg) atend[k].reg = reg;
+  });
+
+  // transferência para exames: ao salvar com a aba liberada e exames na lista, envia ao LabSUS
+  if (liberadasAntes.includes('exames') && !atend.exames.enviadoEm && atend.exames.solicitacoes.length) {
+    atend.exames.enviadoEm = agora();
+    if (!integrarLabSUS(payloadLabSUS(atend))) {
+      showToast('⚠️ Não foi possível enviar ao LabSUS. Tente novamente.');
+      return null;
+    }
+    examesEnviadoEm = atend.exames.enviadoEm;
+  }
+
+  Store.upsert(atend);
+  atendimentos = Store.all();
+
+  // todas as abas concluídas: o paciente seguiu para outro setor e sai da lista
+  if (isConcluido(atend)) {
+    openNew();
+    showToast(`✅ Atendimento concluído — ${destinoFinal(atend)}`);
+    return atend;
+  }
+
+  // continua no mesmo atendimento para seguir para a próxima etapa
+  editingId = atend.id;
+  document.getElementById('fTitle').textContent    = 'Editar atendimento';
+  document.getElementById('fSubtitle').textContent = atend.nome;
+  applyFlow();
+  updateActionButtons();
+  renderList();
+
+  const pendentes = stages.filter(s => !stageDone(atend, s));
+  const liberada  = stages.find(s => !liberadasAntes.includes(s) && isUnlocked(s, stages));
+  if (liberada) {
+    switchTab(liberada);
+    showToast(`✅ Salvo — aba ${STAGE_LABELS[liberada]} liberada`);
+  } else {
+    showToast(`✅ Atendimento salvo — pendente: ${pendentes.map(s => STAGE_LABELS[s].toLowerCase()).join(', ')}`);
+  }
+  return atend;
+}
+
+// ===== DELETE =====
+function openDelete(id, e) {
+  if (e) e.stopPropagation();
+  const a = atendimentos.find(x => x.id === id);
+  deleteId = id;
+  document.getElementById('deleteText').textContent = `Tem certeza que deseja excluir o atendimento de "${a.nome}"? Esta ação não pode ser desfeita.`;
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+function closeDelete() { document.getElementById('deleteModal').classList.remove('open'); deleteId = null; }
+
+function confirmDelete() {
+  Store.remove(deleteId);
+  atendimentos = Store.all();
+  if (editingId === deleteId) { editingId = null; resetForm(); }
+  closeDelete();
+  renderList();
+  showToast('🗑️ Atendimento removido com sucesso!');
+}
+
+document.getElementById('deleteModal').addEventListener('click', function(e) { if (e.target === this) closeDelete(); });
+
+// ===== MASKS =====
+function showErr(id) {
+  document.getElementById(id).classList.add('error');
+  document.getElementById('err-' + id).classList.add('show');
+}
+
+function clearErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('error');
+  const err = document.getElementById('err-' + id);
+  if (err) err.classList.remove('show');
+}
+
+// ===== INIT =====
+iniciarPagina('entradas');
+
+buildColorPalette();
+buildRiskOptions();
+buildAllergySuggestions();
+setupAutocomplete('fNome', 'nome');
+setupAutocomplete('fCNS', 'cns');
+setupAutocomplete('fCPF', 'cpf');
+resetForm();
+renderList();
+
+// atualiza a lista quando outra página (ex.: Observação) alterar os atendimentos
+Store.onChange(() => { atendimentos = Store.all(); renderList(); });
+</script>
+</body>
+</html>

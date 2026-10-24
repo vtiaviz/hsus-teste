@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Finalizados — Ambulatório — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">Atendimentos finalizados no ambulatório</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR: montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav"></ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+
+          <!-- STATS do mês -->
+          <div class="stats-strip" id="statsFin"></div>
+
+          <div class="main-split">
+
+            <!-- LISTA -->
+            <div>
+              <div class="list-card">
+                <div class="list-card-header">
+                  <div>
+                    <h5>Atendimentos finalizados</h5>
+                    <p class="field-hint" style="margin:2px 0 0"><span id="mesNome"></span> · <span id="contFin"></span></p>
+                  </div>
+                  <div class="mes-nav">
+                    <button type="button" class="btn-sm" onclick="mudarMes(-1)" title="Mês anterior" aria-label="Mês anterior"><span class="material-symbols-outlined">chevron_left</span></button>
+                    <input type="month" class="field-input" id="mesFin" aria-label="Mês" onchange="renderFinalizados()">
+                    <button type="button" class="btn-sm" id="mesProximo" onclick="mudarMes(1)" title="Próximo mês" aria-label="Próximo mês"><span class="material-symbols-outlined">chevron_right</span></button>
+                  </div>
+                </div>
+                <div class="filter-chips">
+                  <div id="filtrosFin" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+                  <div class="search-wrap" style="margin-left:auto">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" placeholder="Nome, CNS ou CPF..." oninput="buscaFin = this.value.trim(); renderFinalizados()">
+                  </div>
+                </div>
+                <div id="listaFin"></div>
+                <div class="list-empty" id="vazioFin" style="display:none">
+                  <span class="material-symbols-outlined">inventory_2</span>
+                  <p></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- DETALHE -->
+            <div>
+              <div class="form-card" id="detalheCard">
+                <div class="obs-empty" id="detalheVazio">
+                  <span class="material-symbols-outlined">touch_app</span>
+                  <p>Selecione um atendimento para ver o resumo.</p>
+                </div>
+                <div id="detalheFin" style="display:none">
+                  <div class="form-header">
+                    <div>
+                      <h5 id="detNome"></h5>
+                      <p id="detSub"></p>
+                    </div>
+                    <button type="button" class="btn-close-form" onclick="limparDetalheFin(); renderFinalizados()" title="Fechar">
+                      <span class="material-symbols-outlined" style="font-size:1.1rem">close</span>
+                    </button>
+                  </div>
+                  <div class="form-body">
+                    <div class="ps-body" style="margin-top:0;padding-top:16px" id="detResumo"></div>
+                    <div class="form-section">
+                      <div class="section-label"><span class="material-symbols-outlined">timeline</span> Linha do tempo</div>
+                      <div class="timeline" id="detLinha"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+<script src="./js/sus/sus.js"></script>
+<script src="./js/finalizados.js"></script>
+
+<script>
+iniciarFinalizados('fin-ambulatorio');
+</script>
+</body>
+</html>

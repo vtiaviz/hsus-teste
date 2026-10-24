@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Tabelas SUS — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">CID-10, procedimentos e compatibilidades</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR: montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav"></ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+
+          <div class="cad-stack">
+            <!-- Tabelas em uso -->
+            <div class="cad-card">
+              <div class="cad-card-head">
+                <h5><span class="material-symbols-outlined">database</span> Tabelas em uso</h5>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button type="button" class="btn-cancel" id="btnRestaurar" style="display:none" onclick="restaurar()">Restaurar padrão</button>
+                  <label class="btn-new" style="margin:0" for="arquivoSql">
+                    <span class="material-symbols-outlined">upload_file</span> Importar arquivo SQL
+                  </label>
+                  <input type="file" id="arquivoSql" accept=".sql,.txt" style="display:none" onchange="importar(this)">
+                </div>
+              </div>
+              <div class="cad-card-body" style="padding-bottom:18px">
+                <div class="sus-info">
+                  <div class="ps-item"><span class="ps-label">Fonte</span><span class="ps-value" id="iFonte">—</span></div>
+                  <div class="ps-item"><span class="ps-label">CIDs</span><span class="ps-value" id="iCids">—</span></div>
+                  <div class="ps-item"><span class="ps-label">Procedimentos</span><span class="ps-value" id="iProcs">—</span></div>
+                  <div class="ps-item"><span class="ps-label">Compatibilidades</span><span class="ps-value" id="iPares">—</span></div>
+                </div>
+                <p class="field-hint" id="iDetalhe" style="margin:12px 0 0"></p>
+              </div>
+            </div>
+
+            <!-- Consulta -->
+            <div class="cad-card">
+              <div class="cad-card-head">
+                <div class="sus-tabs" id="susTabs">
+                  <button type="button" class="chip active" data-aba="cids" onclick="setAba('cids')">CIDs</button>
+                  <button type="button" class="chip" data-aba="procs" onclick="setAba('procs')">Procedimentos</button>
+                  <button type="button" class="chip" data-aba="pares" onclick="setAba('pares')">CID × Procedimento</button>
+                </div>
+                <div class="search-wrap">
+                  <span class="material-symbols-outlined">search</span>
+                  <input type="text" id="busca" placeholder="Código ou descrição..." oninput="agendarBusca()">
+                </div>
+              </div>
+              <div class="sus-scroll">
+                <table class="sus-table">
+                  <thead id="tCabecalho"></thead>
+                  <tbody id="tCorpo"></tbody>
+                </table>
+              </div>
+              <div class="sus-rodape" id="tRodape"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+<script src="./js/sus/conversor.js"></script>
+<script src="./js/sus/sus.js"></script>
+
+<script>
+const LIMITE = 100;
+const SEXO_LABEL = { I: 'Ambos', N: 'Ambos', M: 'Masculino', F: 'Feminino' };
+let aba = 'cids';
+let aberto = null;     // código da linha com detalhe aberto
+let timerBusca = null;
+
+const fmtNum = n => Number(n).toLocaleString('pt-BR');
+// idade da tabela de procedimentos vem em meses (1571 = sem limite)
+const fmtIdade = m => (m >= 1440 ? 'sem limite' : m < 12 ? `${m} ${m === 1 ? 'mês' : 'meses'}` : `${Math.floor(m / 12)} anos`);
+
+function renderInfo() {
+  const i = SUS.info();
+  document.getElementById('iFonte').textContent = i.fonte === 'importado' ? 'Importada' : 'Padrão do sistema';
+  document.getElementById('iCids').textContent = fmtNum(i.cids);
+  document.getElementById('iProcs').textContent = fmtNum(i.procedimentos);
+  document.getElementById('iPares').textContent = fmtNum(i.pares);
+  document.getElementById('iDetalhe').textContent = i.fonte === 'importado'
+    ? `Arquivo "${i.origem}", importado em ${new Date(i.importadoEm).toLocaleString('pt-BR')}. Fica guardado neste navegador.`
+    : `Arquivo "${i.origem}", convertido em ${fmtData(i.geradoEm)} (js/sus/dados.js).`;
+  document.getElementById('btnRestaurar').style.display = i.fonte === 'importado' ? '' : 'none';
+}
+
+function setAba(nova) {
+  aba = nova;
+  aberto = null;
+  document.querySelectorAll('#susTabs .chip').forEach(c => c.classList.toggle('active', c.dataset.aba === nova));
+  renderTabela();
+}
+
+function agendarBusca() {
+  clearTimeout(timerBusca);
+  timerBusca = setTimeout(() => { aberto = null; renderTabela(); }, 200);
+}
+
+function renderTabela() {
+  const termo = document.getElementById('busca').value;
+  const cab = document.getElementById('tCabecalho');
+  const corpo = document.getElementById('tCorpo');
+  let linhas = [];
+
+  if (aba === 'cids') {
+    cab.innerHTML = '<tr><th>Código</th><th>Descrição</th><th>Sexo</th><th>Procedimentos</th></tr>';
+    linhas = SUS.listarCids(termo, LIMITE);
+    corpo.innerHTML = linhas.map(c => {
+      const procs = SUS.procedimentosCompativeis(c.cod);
+      const detalhe = aberto === c.cod ? `<tr class="sus-detalhe"><td colspan="4">
+          <strong>Procedimentos compatíveis com ${esc(SUS.fmtCid(c.cod))}</strong>
+          ${procs.length ? `<ul>${procs.map(p => `<li><span class="cod">${esc(SUS.fmtProc(p.cod))}</span> ${esc(p.descricao)}</li>`).join('')}</ul>` : '<p class="field-hint">Nenhum procedimento compatível.</p>'}
+        </td></tr>` : '';
+      return `<tr class="clicavel ${aberto === c.cod ? 'aberto' : ''}" onclick="alternar('${c.cod}')">
+          <td class="cod">${esc(SUS.fmtCid(c.cod))}</td><td>${esc(c.descricao)}</td><td>${SEXO_LABEL[c.sexo] || c.sexo}</td><td>${procs.length}</td>
+        </tr>${detalhe}`;
+    }).join('');
+  } else if (aba === 'procs') {
+    cab.innerHTML = '<tr><th>Código</th><th>Descrição</th><th>Sexo</th><th>Idade</th><th>CIDs</th></tr>';
+    linhas = SUS.listarProcedimentos(termo, LIMITE);
+    corpo.innerHTML = linhas.map(p => {
+      const cids = SUS.cidsDoProcedimento(p.cod);
+      const detalhe = aberto === p.cod ? `<tr class="sus-detalhe"><td colspan="5">
+          <strong>CIDs compatíveis com ${esc(SUS.fmtProc(p.cod))}</strong>
+          ${cids.length ? `<ul>${cids.map(c => `<li><span class="cod">${esc(SUS.fmtCid(c.cod))}</span> ${esc(c.descricao)}</li>`).join('')}</ul>` : '<p class="field-hint">Nenhum CID compatível.</p>'}
+        </td></tr>` : '';
+      return `<tr class="clicavel ${aberto === p.cod ? 'aberto' : ''}" onclick="alternar('${p.cod}')">
+          <td class="cod">${esc(SUS.fmtProc(p.cod))}</td><td>${esc(p.descricao)}</td><td>${SEXO_LABEL[p.sexo] || p.sexo}</td>
+          <td style="white-space:nowrap">${!p.idadeMin && p.idadeMax >= 1440 ? 'Qualquer idade' : `${fmtIdade(p.idadeMin)} a ${fmtIdade(p.idadeMax)}`}</td><td>${cids.length}</td>
+        </tr>${detalhe}`;
+    }).join('');
+  } else {
+    cab.innerHTML = '<tr><th>CID</th><th>Descrição do CID</th><th>Procedimento</th><th>Descrição do procedimento</th></tr>';
+    linhas = SUS.listarPares(termo, LIMITE);
+    corpo.innerHTML = linhas.map(({ cid, proc }) => `<tr>
+        <td class="cod">${esc(SUS.fmtCid(cid.cod))}</td><td>${esc(cid.descricao)}</td>
+        <td class="cod">${esc(SUS.fmtProc(proc.cod))}</td><td>${esc(proc.descricao)}</td>
+      </tr>`).join('');
+  }
+
+  if (!linhas.length) corpo.innerHTML = `<tr><td colspan="5" class="list-empty"><p>Nada encontrado.</p></td></tr>`;
+  const i = SUS.info();
+  const totalAba = { cids: i.cids, procs: i.procedimentos, pares: i.pares }[aba];
+  document.getElementById('tRodape').textContent = linhas.length >= LIMITE
+    ? `Mostrando os primeiros ${LIMITE} de ${fmtNum(totalAba)}. Refine a busca para encontrar o que procura.`
+    : `${fmtNum(linhas.length)} resultado${linhas.length === 1 ? '' : 's'}${termo ? '' : ` de ${fmtNum(totalAba)}`}.`
+      + (aba !== 'pares' ? ' Clique numa linha para ver as compatibilidades.' : '');
+}
+
+function alternar(cod) {
+  aberto = aberto === cod ? null : cod;
+  renderTabela();
+}
+
+// ===== IMPORTAÇÃO =====
+async function importar(input) {
+  const arquivo = input.files[0];
+  input.value = '';
+  if (!arquivo) return;
+  const detalhe = document.getElementById('iDetalhe');
+  detalhe.textContent = `Lendo "${arquivo.name}"...`;
+  try {
+    const texto = await arquivo.text();
+    detalhe.textContent = 'Convertendo as tabelas...';
+    await new Promise(r => setTimeout(r, 30)); // deixa a mensagem aparecer antes da conversão
+    const r = await SUS.importar(texto, arquivo.name);
+    showToast(`✅ Importado: ${fmtNum(r.cids)} CIDs, ${fmtNum(r.procedimentos)} procedimentos, ${fmtNum(r.pares)} compatibilidades`);
+    renderInfo();
+    setAba(aba);
+  } catch (err) {
+    renderInfo();
+    showToast(`⚠️ Não foi possível importar: ${err.message}`);
+  }
+}
+
+async function restaurar() {
+  if (!confirm('Voltar às tabelas padrão do sistema? A importação feita neste navegador será descartada.')) return;
+  await SUS.restaurarPadrao();
+  showToast('✅ Tabelas padrão restauradas');
+  renderInfo();
+  setAba(aba);
+}
+
+// ===== INIT =====
+if (iniciarPagina('tabelas-sus')) {
+  document.getElementById('iDetalhe').textContent = 'Carregando tabelas SUS...';
+  SUS.carregar()
+    .then(() => { renderInfo(); renderTabela(); })
+    .catch(err => { document.getElementById('iDetalhe').textContent = `⚠️ ${err.message}`; });
+}
+</script>
+</body>
+</html>

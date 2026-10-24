@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Em observação — ClinBot</title>
+  <link rel="stylesheet" href="./css/feather.css">
+  <link rel="stylesheet" href="./css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="./css/themify-icons.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/typicons.css">
+  <link rel="stylesheet" href="./css/simple-line-icons.css">
+  <link rel="stylesheet" href="./css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="./images/favicon.ico" sizes="32x32"/>
+  <link rel="icon" href="./images/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png"/>
+
+  <link rel="stylesheet" href="./css/clinbot.css">
+</head>
+
+<body>
+<div class="container-scroller">
+
+  <!-- NAVBAR -->
+  <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <i class="material-symbols-outlined menu-icon">menu</i>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="entradas.html"><img src="./images/logo.png" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="entradas.html"><img src="./images/logo-mini.png" alt="logo"/></a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <li class="nav-item fw-semibold d-none d-md-block ms-0">
+        <h2 class="welcome-text mb-3"><span id="greeting">Bom dia</span>, <span class="text-black fw-bold" data-usuario="primeiro-nome"></span></h2>
+        <h5 class="welcome-sub-text">Acompanhe os pacientes em observação</h5>
+      </li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item d-none d-lg-block">
+          <div class="navbar-clock" title="Data e hora atual">
+            <span class="material-symbols-outlined">schedule</span>
+            <span id="clockDate"></span>
+            <span class="clock-sep"></span>
+            <span id="clockTime"></span>
+          </div>
+        </li>
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="./images/person.svg" alt="Profile">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+              <img class="img-md rounded-circle" src="./images/person.svg" alt="Profile">
+              <p class="mb-1 mt-3 fw-semibold" data-usuario="nome"></p>
+              <p class="fw-light text-muted mb-0" data-usuario="cargo"></p>
+            </div>
+            <a class="dropdown-item"><i class="material-symbols-outlined menu-icon p-2">person</i>Meu Perfil</a>
+            <a class="dropdown-item" href="login.html" data-acao="sair"><i class="material-symbols-outlined menu-icon p-2">power_settings_new</i>Sair</a>
+          </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container-fluid page-body-wrapper">
+    <!-- SIDEBAR -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <ul class="nav">
+        <!-- montado por renderSidebar() em js/clinbot.js, conforme o perfil de acesso -->
+      </ul>
+    </nav>
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="page-wrapper">
+
+          <div class="main-split">
+
+            <!-- LIST -->
+            <div>
+              <div class="list-card">
+                <div class="list-card-header">
+                  <h5>Atendimentos</h5>
+                  <div class="search-wrap">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="searchInput" placeholder="Nome, CPF, CNS ou telefone..." oninput="filterObs(this.value)">
+                  </div>
+                </div>
+
+                <div class="filter-chips">
+                  <button class="chip active" onclick="setFilter('all',this)">Todos</button>
+                  <button class="chip" onclick="setFilter('med-pendente',this)">Medicação pendente</button>
+                </div>
+
+                <div id="obsList"></div>
+
+                <div class="list-empty" id="emptyState" style="display:none">
+                  <span class="material-symbols-outlined">person_off</span>
+                  <p>Nenhum paciente em observação.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- RESUMO + FORM -->
+            <div>
+              <div class="form-card obs-card" id="obsCard">
+
+                <div class="obs-empty" id="obsEmpty">
+                  <span class="material-symbols-outlined">touch_app</span>
+                  <p>Selecione um paciente na lista.</p>
+                </div>
+
+                <div class="form-body" id="obsBody" style="display:none">
+
+                  <!-- Resumo do paciente -->
+                  <div class="ps-banner"></div>
+                  <div class="ps-body" id="patientSummary"></div>
+
+                  <!-- Check-in de medicamentos -->
+                  <div class="form-section">
+                    <div class="section-label">
+                      <span class="material-symbols-outlined">medication</span> Check-in de Medicamentos
+                    </div>
+                    <div id="checkinList"></div>
+                  </div>
+
+                  <!-- Procedimentos -->
+                  <div class="form-section">
+                    <div class="section-label">
+                      <span class="material-symbols-outlined">healing</span> Procedimentos Realizados
+                    </div>
+                    <div style="overflow-x:auto">
+                      <table class="cal-table">
+                        <thead>
+                          <tr>
+                            <th>Procedimento</th>
+                            <th style="width:110px">Hora</th>
+                            <th style="width:36px"></th>
+                          </tr>
+                        </thead>
+                        <tbody id="procTableBody"></tbody>
+                      </table>
+                    </div>
+                    <button type="button" class="btn-table-add" onclick="addRow('procTableBody', { hora: isoTime(new Date()) })">
+                      <span class="material-symbols-outlined" style="font-size:.95rem">add</span> Adicionar procedimento
+                    </button>
+                  </div>
+
+                  <!-- Anotação de enfermagem -->
+                  <div class="form-section">
+                    <div class="section-label">
+                      <span class="material-symbols-outlined">edit_note</span> Anotação de Enfermagem
+                    </div>
+                    <div class="nota-list" id="notaList"></div>
+                    <div class="field-group">
+                      <label class="field-label" for="oNota">Nova anotação</label>
+                      <textarea class="field-textarea" id="oNota" placeholder="Evolução, intercorrências, orientações..."></textarea>
+                      <div class="field-hint">Registrada com a hora atual ao salvar.</div>
+                    </div>
+                  </div>
+
+                  <!-- Encaminhamento -->
+                  <div class="form-section">
+                    <div class="section-label">
+                      <span class="material-symbols-outlined">alt_route</span> Encaminhamento
+                    </div>
+                    <div class="field-group">
+                      <div class="transf-opts enc-obs" id="encObsOpts">
+                        <button type="button" class="transf-opt" data-value="alta" onclick="setEncObs(this.dataset.value)">
+                          <span class="material-symbols-outlined">directions_walk</span>Alta
+                        </button>
+                        <button type="button" class="transf-opt" data-value="internacao" onclick="setEncObs(this.dataset.value)">
+                          <span class="material-symbols-outlined">home_health</span>Internação
+                        </button>
+                      </div>
+                      <div class="field-hint">Ao salvar com encaminhamento, o paciente sai da observação.</div>
+                    </div>
+                  </div>
+
+                  <div class="form-footer">
+                    <button type="button" class="btn-cancel" onclick="selectAtend(selectedId)">Descartar</button>
+                    <button type="button" class="btn-save" onclick="saveObs()">
+                      <span class="material-symbols-outlined">check_circle</span>
+                      Salvar
+                    </button>
+                  </div>
+
+                </div><!-- /form-body -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="d-sm-flex justify-content-center">
+          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Desenvolvido por Victor Aviz © 2026 - Todos os direitos reservados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="cal-toast" id="toast">
+  <div class="toast-ic">✓</div>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./js/vendor.bundle.base.js"></script>
+<script src="./js/off-canvas.js"></script>
+<script src="./js/template.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/hoverable-collapse.js"></script>
+<script src="./js/todolist.js"></script>
+<script src="./js/clinbot.js"></script>
+
+<script>
+// ===== CONSTANTS =====
+const TABELAS = {
+  procTableBody: { campos:['proc','hora'], placeholders:['Ex: Curativo, nebulização...', ''], tipos:['text','time'] },
+};
+const ENC_OBS_LABELS = { alta:'Alta', internacao:'Internação' };
+
+// ===== STATE =====
+let atendimentos = Store.all();
+let selectedId   = null;
+let activeFilter = 'all';
+let searchQuery  = '';
+let checkins     = [];  // alinhado com consulta.prescricao: { administrado, hora }
+let encObs       = '';
+
+const emObservacao = () => atendimentos.filter(isEmObservacao);
+const findAtend    = id => atendimentos.find(a => a.id === id);
+
+// ===== MEDICAÇÃO =====
+const prescricaoDe = a => a.consulta.prescricao || [];
+
+function medStatus(a) {
+  const total = prescricaoDe(a).length;
+  const feitos = prescricaoDe(a).filter((_, i) => a.observacao?.checkins?.[i]?.administrado).length;
+  return { total, feitos, pendente: feitos < total };
+}
+
+// ===== RENDER LIST =====
+function renderList() {
+  const list  = document.getElementById('obsList');
+  const empty = document.getElementById('emptyState');
+  const qDigits = searchQuery.replace(/\D/g, '');
+
+  const data = emObservacao().filter(a => {
+    const mf = activeFilter !== 'med-pendente' || medStatus(a).pendente;
+    const ms = !searchQuery ||
+      a.nome.toLowerCase().includes(searchQuery) ||
+      (qDigits && [a.ident.cpf, a.ident.cns, a.ident.telefone].some(v => (v || '').replace(/\D/g, '').includes(qDigits)));
+    return mf && ms;
+  }).sort((x, y) => (x.data + x.hora).localeCompare(y.data + y.hora));
+
+  if (!data.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = '';
+
+  data.forEach(a => {
+    const risco = RISCOS[a.triagem.risco];
+    const riscoBadge = risco ? `<div class="risk-badge" style="--rc:${risco.cor}" title="${risco.label}">${risco.nome}</div>` : '';
+    const med = medStatus(a);
+    const medPill = med.total
+      ? `<span class="stage-pill ${med.pendente ? 'pending' : 'done'}"><span class="material-symbols-outlined">medication</span>Medicação ${med.feitos}/${med.total}</span>`
+      : '';
+    const diag = a.consulta.diagnostico ? `${a.consulta.cid ? a.consulta.cid + ' · ' : ''}${a.consulta.diagnostico}` : a.relato;
+
+    const item = document.createElement('div');
+    item.className = 'patient-item' + (selectedId === a.id ? ' selected' : '');
+    item.innerHTML = `
+      <div class="pat-avatar" style="background:${a.color}">${esc(iniciais(a.nome))}</div>
+      <div class="pat-info">
+        <h6>${esc(a.nome)}</h6>
+        <p>🕒 ${fmtData(a.data)} ${esc(a.hora)} &nbsp;·&nbsp; ${a.origem === 'transferencia' ? '🚑 Transferência' : '🆕 Novo'}</p>
+        <p style="margin-top:1px;font-size:.69rem">${esc(diag)}</p>
+        <div class="stage-pills">
+          ${medPill}
+          <span class="stage-pill pending"><span class="material-symbols-outlined">schedule</span>Encaminhamento</span>
+        </div>
+      </div>
+      <div class="pat-meta">${riscoBadge}</div>
+    `;
+    item.addEventListener('click', () => selectAtend(a.id));
+    list.appendChild(item);
+  });
+}
+
+function setFilter(f, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = f;
+  renderList();
+}
+
+function filterObs(q) {
+  searchQuery = q.trim().toLowerCase();
+  renderList();
+}
+
+// ===== RESUMO DO PACIENTE =====
+function valor(v, sufixo = '') {
+  return v ? `<span class="ps-value">${esc(v)}${sufixo}</span>` : '<span class="ps-value vazio">—</span>';
+}
+
+function bloco(label, texto) {
+  return `<div class="ps-block"><span class="ps-label">${label}</span><p class="${texto ? '' : 'vazio'}">${esc(texto || '—')}</p></div>`;
+}
+
+function renderSummary(a) {
+  const i = a.ident, t = a.triagem, c = a.consulta;
+  const idade = calcAge(i.nasc);
+  const docs = [i.cns && `CNS ${i.cns}`, i.cpf && `CPF ${i.cpf}`].filter(Boolean).join(' · ');
+
+  // sem triagem (transferência) não há como saber das alergias
+  let alergias = '<span class="ps-value vazio">—</span>';
+  if (a.origem === 'novo' && t.risco) {
+    alergias = t.alergias?.length
+      ? `<span class="ps-value alergia">⚠️ ${esc(t.alergias.join(', '))}</span>`
+      : '<span class="ps-value sem-alergia">✓ Nenhuma</span>';
+  }
+
+  document.getElementById('patientSummary').innerHTML = `
+    <div class="pat-avatar ps-avatar" style="background:${a.color}">${esc(iniciais(a.nome))}</div>
+    <div class="ps-name">${esc(a.nome)}</div>
+    <p class="ps-sub">${esc(docs || 'Sem documento informado')}</p>
+
+    <div class="section-label"><span class="material-symbols-outlined">person</span> Informações do Paciente</div>
+    <div class="ps-grid">
+      <div class="ps-item"><span class="ps-label">Sexo</span>${valor(SEXOS[i.sexo])}</div>
+      <div class="ps-item"><span class="ps-label">Idade</span>${valor(idade !== null ? idade : '', idade !== null ? ' anos' : '')}</div>
+      <div class="ps-item"><span class="ps-label">Raça</span>${valor(RACAS[i.raca])}</div>
+      <div class="ps-item"><span class="ps-label">Alergias</span>${alergias}</div>
+    </div>
+    <div class="ps-grid ps-vitals">
+      <div class="ps-item"><span class="ps-label">Pressão</span>${valor(t.pa)}</div>
+      <div class="ps-item"><span class="ps-label">Temp.</span>${valor(t.temp, ' °C')}</div>
+      <div class="ps-item"><span class="ps-label">FC</span>${valor(t.fc, ' bpm')}</div>
+      <div class="ps-item"><span class="ps-label">SpO₂</span>${valor(t.spo2, '%')}</div>
+    </div>
+    ${bloco('Queixa principal', t.queixa)}
+    ${bloco('Diagnóstico inicial', c.diagnostico ? `${c.cid ? c.cid + ' — ' : ''}${c.diagnostico}` : '')}
+    ${bloco('Plano de cuidado', c.plano)}
+    ${bloco('Médico responsável', c.medico)}
+  `;
+}
+
+// ===== CHECK-IN =====
+function renderCheckins(a) {
+  const wrap = document.getElementById('checkinList');
+  const meds = prescricaoDe(a);
+  if (!meds.length) {
+    wrap.innerHTML = '<p class="field-hint" style="margin:0 0 6px">Nenhum medicamento prescrito na consulta.</p>';
+    return;
+  }
+  wrap.innerHTML = meds.map((m, i) => {
+    const ck = checkins[i] || {};
+    return `
+      <label class="checkin-item ${ck.administrado ? 'done' : ''}">
+        <input type="checkbox" ${ck.administrado ? 'checked' : ''} onchange="toggleCheckin(${i}, this.checked)">
+        <div class="checkin-info"><strong>${esc(m.med)}</strong><span>${esc(m.pos || '')}</span></div>
+        <span class="checkin-time">${ck.administrado ? 'Administrado às ' + esc(ck.hora) : ''}</span>
+      </label>`;
+  }).join('');
+}
+
+// o check-in é gravado na hora, sem depender do Salvar
+function toggleCheckin(i, administrado) {
+  const a = findAtend(selectedId);
+  // quem fez e quando ficam no registro; desfazer também fica registrado
+  checkins[i] = administrado
+    ? { administrado: true, hora: isoTime(new Date()), ...marcaAutoria() }
+    : { administrado: false, hora: '', desfeito: { ...marcaAutoria(), hora: checkins[i]?.hora || '' } };
+  Store.upsert({ id: a.id, observacao: { ...(a.observacao || {}), checkins } });
+  atendimentos = Store.all();
+  renderCheckins(findAtend(selectedId));
+  renderList();
+  const med = prescricaoDe(a)[i].med;
+  showToast(administrado ? `💊 ${med} administrado às ${checkins[i].hora}` : `↩️ Check-in de ${med} desfeito`);
+}
+
+// ===== ANOTAÇÕES =====
+function renderNotas(a) {
+  const notas = a.observacao?.anotacoes || [];
+  document.getElementById('notaList').innerHTML = notas.map(n =>
+    `<div class="nota"><span class="nota-hora">${esc(fmtDataHora(n.em))}${n.por ? ' · ' + esc(n.por.nome) : ''}</span><p>${esc(n.texto)}</p></div>`
+  ).join('');
+}
+
+// ===== ENCAMINHAMENTO =====
+function setEncObs(value) {
+  encObs = encObs === value ? '' : value;
+  document.querySelectorAll('#encObsOpts .transf-opt').forEach(o => o.classList.toggle('selected', o.dataset.value === encObs));
+}
+
+// ===== SELEÇÃO =====
+function selectAtend(id) {
+  const a = findAtend(id);
+  if (!a || !isEmObservacao(a)) { clearSelection(); return; }
+  selectedId = id;
+  const obs = a.observacao || {};
+  checkins = prescricaoDe(a).map((_, i) => ({ ...(obs.checkins?.[i] || { administrado: false, hora: '' }) }));
+
+  renderSummary(a);
+  renderCheckins(a);
+  fillTable('procTableBody', obs.procedimentos);
+  renderNotas(a);
+  document.getElementById('oNota').value = '';
+  encObs = '';
+  setEncObs('');
+
+  document.getElementById('obsEmpty').style.display = 'none';
+  document.getElementById('obsBody').style.display = 'block';
+  document.getElementById('obsBody').scrollTop = 0;
+  renderList();
+  if (window.innerWidth <= 1100) document.getElementById('obsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function clearSelection() {
+  selectedId = null;
+  document.getElementById('obsEmpty').style.display = 'block';
+  document.getElementById('obsBody').style.display = 'none';
+  renderList();
+}
+
+// ===== SAVE =====
+function saveObs() {
+  const a = findAtend(selectedId);
+  if (!a) return;
+  const obs = a.observacao || {};
+  const texto = document.getElementById('oNota').value.trim();
+
+  const observacao = {
+    ...obs,
+    checkins,
+    procedimentos: manterAutoria(readTable('procTableBody').map(p => ({ ...p, hora: p.hora || isoTime(new Date()) })), obs.procedimentos),
+    anotacoes: texto ? [...(obs.anotacoes || []), { em: agora(), por: autorAtual(), texto }] : (obs.anotacoes || []),
+  };
+  if (encObs) {
+    observacao.encaminhamento = encObs;
+    observacao.encaminhadoEm  = agora();
+    observacao.encaminhadoPor = autorAtual();
+  }
+
+  Store.upsert({ id: a.id, observacao });
+  atendimentos = Store.all();
+
+  if (encObs) {
+    const pendentes = medStatus(findAtend(a.id));
+    showToast(encObs === 'alta'
+      ? `✅ ${a.nome} recebeu alta${pendentes.pendente ? ' (com medicação não administrada)' : ''}`
+      : `✅ ${a.nome} encaminhado para Internação`);
+    const proximo = emObservacao()[0];
+    proximo ? selectAtend(proximo.id) : clearSelection();
+    return;
+  }
+
+  showToast('✅ Observação salva');
+  selectAtend(a.id);
+}
+
+// ===== INIT =====
+iniciarPagina('observacao');
+
+renderList();
+const primeiro = emObservacao().sort((x, y) => (x.data + x.hora).localeCompare(y.data + y.hora))[0];
+if (primeiro) selectAtend(primeiro.id);
+
+// outra página (ex.: Entradas) alterou os atendimentos: atualiza a lista sem perder o que está sendo digitado
+Store.onChange(() => {
+  atendimentos = Store.all();
+  if (selectedId && !emObservacao().some(a => a.id === selectedId)) clearSelection();
+  else renderList();
+});
+</script>
+</body>
+</html>
